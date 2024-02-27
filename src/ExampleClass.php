@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostya1p\JwtAuth;
+namespace Kostyap\JwtAuth;
 
 final class ExampleClass
 {

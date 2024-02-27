@@ -1,8 +1,8 @@
 <?php
 
-namespace Kostya1p\JwtAuth\tests\Unit;
+namespace Kostyap\JwtAuth\test\Unit;
 
-use Kostya1p\JwtAuth\ExampleClass;
+use Kostyap\JwtAuth\ExampleClass;
 use PHPUnit\Framework\TestCase;
 
 class ExampleClassTest extends TestCase

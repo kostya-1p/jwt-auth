@@ -1,5 +1,5 @@
 {
-    "name": "kostya-1p/jwt-auth",
+    "name": "kostya-p/jwt-auth",
     "description": "JSON Web Token Authentication",
     "type": "library",
     "require": {
@@ -12,12 +12,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Kostya1p\\JwtAuth\\": "src/"
+            "Kostyap\\JwtAuth\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Kostya1p\\JwtAuth\\test\\": "tests/"
+            "Kostyap\\JwtAuth\\test\\": "tests/"
         }
     },
     "minimum-stability": "stable"
