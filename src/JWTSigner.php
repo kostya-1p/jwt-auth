@@ -24,6 +24,10 @@ class JWTSigner
     protected string $algo;
     protected Signer $JWTSigner;
 
+    protected ?string $secret;
+    protected ?string $publicKey;
+    protected ?string $privateKey;
+
     protected array $signers = [
         self::ALGO_HS256 => Signer\Hmac\Sha256::class,
         self::ALGO_HS384 => Signer\Hmac\Sha384::class,
@@ -39,6 +43,9 @@ class JWTSigner
     public function __construct()
     {
         $this->algo = config('jwt.algo');
+        $this->secret = config('jwt.secret');
+        $this->publicKey = config('jwt.keys.public');
+        $this->privateKey = config('jwt.keys.private');
     }
 
     public function getJWTSigner(): Signer
@@ -55,39 +62,35 @@ class JWTSigner
     public function getSigningKey(): Key
     {
         if ($this->isAsymmetric()) {
-            $privateKey = config('jwt.keys.private');
-            if (!$privateKey) {
+            if (!$this->privateKey) {
                 throw new JWTException('Private key is not set.');
             }
 
-            return $this->getKey($privateKey);
+            return $this->getKey($this->privateKey);
         }
 
-        $secret = config('jwt.secret');
-        if (!$secret) {
+        if (!$this->secret) {
             throw new JWTException('Secret is not set.');
         }
 
-        return $this->getKey($secret);
+        return $this->getKey($this->secret);
     }
 
     public function getVerificationKey(): Key
     {
         if ($this->isAsymmetric()) {
-            $publicKey = config('jwt.keys.public');
-            if (!$publicKey) {
+            if (!$this->publicKey) {
                 throw new JWTException('Public key is not set.');
             }
 
-            return $this->getKey($publicKey);
+            return $this->getKey($this->publicKey);
         }
 
-        $secret = config('jwt.secret');
-        if (!$secret) {
+        if (!$this->secret) {
             throw new JWTException('Secret is not set.');
         }
 
-        return $this->getKey($secret);
+        return $this->getKey($this->secret);
     }
 
     protected function isAsymmetric(): bool
