@@ -37,8 +37,7 @@ class PayloadGenerator
                 RegisteredClaims::NOT_BEFORE => $tokenBuilder->canOnlyBeUsedAfter($this->nbf()),
                 RegisteredClaims::ID => $tokenBuilder->identifiedBy($this->jti()),
                 RegisteredClaims::ISSUER => $tokenBuilder->issuedBy($this->iss()),
-                //TODO
-                RegisteredClaims::AUDIENCE => $tokenBuilder->permittedFor(''),
+                RegisteredClaims::AUDIENCE => $tokenBuilder->permittedFor($this->aud()),
                 //TODO
                 RegisteredClaims::SUBJECT => $tokenBuilder->relatedTo(''),
                 default => throw new InvalidClaimsException('Unexpected JWT default claim'),
@@ -50,6 +49,7 @@ class PayloadGenerator
 
     private function iss(): string
     {
+        return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     }
 
     private function iat(): DateTimeImmutable
@@ -70,5 +70,10 @@ class PayloadGenerator
     private function jti(): string
     {
         return base64_encode(random_bytes(16));
+    }
+
+    private function aud(): string
+    {
+        return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]";
     }
 }
