@@ -26,22 +26,34 @@ class PayloadGenerator
     /**
      * @throws InvalidClaimsException
      */
-    public function getBuilderWithClaims(): Builder
+    public function getBuilderWithClaims(JWTSubject $subject): Builder
     {
         $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
 
         foreach ($this->claims as $claim) {
             match ($claim) {
                 RegisteredClaims::ISSUED_AT => $tokenBuilder->issuedAt($this->iat()),
+
                 RegisteredClaims::EXPIRATION_TIME => $tokenBuilder->expiresAt($this->exp()),
+
                 RegisteredClaims::NOT_BEFORE => $tokenBuilder->canOnlyBeUsedAfter($this->nbf()),
+
                 RegisteredClaims::ID => $tokenBuilder->identifiedBy($this->jti()),
+
                 RegisteredClaims::ISSUER => $tokenBuilder->issuedBy($this->iss()),
+
                 RegisteredClaims::AUDIENCE => $tokenBuilder->permittedFor($this->aud()),
-                //TODO
-                RegisteredClaims::SUBJECT => $tokenBuilder->relatedTo(''),
+
+                RegisteredClaims::SUBJECT => $tokenBuilder->relatedTo($subject->getJWTIdentifier()),
+
                 default => throw new InvalidClaimsException('Unexpected JWT default claim'),
             };
+        }
+
+        $customClaims = $subject->getJWTCustomClaims();
+
+        foreach ($customClaims as $key => $value) {
+            $tokenBuilder->withClaim($key, $value);
         }
 
         return $tokenBuilder;
