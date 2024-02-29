@@ -13,7 +13,8 @@ class LaravelServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__.'/../config/config.php' => config_path(self::CONFIG_NAME),
+            __DIR__ . '/../config/config.php' => config_path(self::CONFIG_NAME),
+            'config'
         ]);
 
         $this->extendAuthGuard();
