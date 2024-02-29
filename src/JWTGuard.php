@@ -2,32 +2,20 @@
 
 namespace Kostyap\JwtAuth;
 
+use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 
 class JWTGuard implements Guard
 {
+    use GuardHelpers;
+
     public function __construct(
         private JWT $jwt,
-        private UserProvider $provider,
+        UserProvider $provider,
     ) {
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function check()
-    {
-        // TODO: Implement check() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function guest()
-    {
-        // TODO: Implement guest() method.
+        $this->provider = $provider;
     }
 
     /**
@@ -35,15 +23,12 @@ class JWTGuard implements Guard
      */
     public function user()
     {
-        // TODO: Implement user() method.
-    }
+        if ($this->user !== null) {
+            return $this->user;
+        }
 
-    /**
-     * @inheritDoc
-     */
-    public function id()
-    {
-        // TODO: Implement id() method.
+        //TODO: Get user from token
+        return $this->user;
     }
 
     /**
@@ -51,7 +36,7 @@ class JWTGuard implements Guard
      */
     public function validate(array $credentials = []): bool
     {
-        return (bool) $this->attempt($credentials, false);
+        return (bool)$this->attempt($credentials, false);
     }
 
     public function attempt(array $credentials = [], bool $login = true): bool|string
@@ -74,21 +59,5 @@ class JWTGuard implements Guard
     protected function hasValidCredentials(?Authenticatable $user, array $credentials): bool
     {
         return $user !== null && $this->provider->validateCredentials($user, $credentials);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasUser()
-    {
-        // TODO: Implement hasUser() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setUser(Authenticatable $user)
-    {
-        // TODO: Implement setUser() method.
     }
 }
