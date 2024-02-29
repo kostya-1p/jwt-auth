@@ -24,5 +24,12 @@
             "Kostyap\\JwtAuth\\test\\": "tests/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Kostyap\\JWTAuth\\JwtAuthServiceProvider"
+            ]
+        }
+    }
 }

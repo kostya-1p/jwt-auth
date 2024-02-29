@@ -6,7 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
-class LaravelServiceProvider extends ServiceProvider
+class JwtAuthServiceProvider extends ServiceProvider
 {
     public const CONFIG_NAME = 'jwt.php';
 
