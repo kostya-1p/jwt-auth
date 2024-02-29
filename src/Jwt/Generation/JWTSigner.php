@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth;
+namespace Kostyap\JwtAuth\Jwt\Generation;
 
 use Kostyap\JwtAuth\Exceptions\JWTException;
 use Lcobucci\JWT\Signer;

@@ -1,10 +1,11 @@
 <?php
 
-namespace Kostyap\JwtAuth;
+namespace Kostyap\JwtAuth\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 
 class JwtAuthServiceProvider extends ServiceProvider
 {
@@ -24,7 +25,7 @@ class JwtAuthServiceProvider extends ServiceProvider
     {
         Auth::extend('jwt', function (Application $app, string $name, array $config) {
             return new JWTGuard(
-                $app->make(JWT::class),
+                $app->make(JWTGenerator::class),
                 Auth::createUserProvider($config['provider']),
             );
         });

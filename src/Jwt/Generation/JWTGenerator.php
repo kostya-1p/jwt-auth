@@ -1,8 +1,10 @@
 <?php
 
-namespace Kostyap\JwtAuth;
+namespace Kostyap\JwtAuth\Jwt\Generation;
 
-class JWT
+use Kostyap\JwtAuth\Jwt\JWTSubject;
+
+class JWTGenerator
 {
     public function __construct(
         private JWTSigner $signer,

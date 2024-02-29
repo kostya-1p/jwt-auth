@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth;
+namespace Kostyap\JwtAuth\Jwt;
 
 interface JWTSubject
 {

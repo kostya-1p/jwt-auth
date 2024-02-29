@@ -1,18 +1,20 @@
 <?php
 
-namespace Kostyap\JwtAuth;
+namespace Kostyap\JwtAuth\Providers;
 
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
+use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
+use Kostyap\JwtAuth\Jwt\JWTSubject;
 
 class JWTGuard implements Guard
 {
     use GuardHelpers;
 
     public function __construct(
-        private JWT $jwt,
+        private JWTGenerator $jwt,
         UserProvider $provider,
     ) {
         $this->provider = $provider;

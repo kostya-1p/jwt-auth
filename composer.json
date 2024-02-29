@@ -28,7 +28,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Kostyap\\JWTAuth\\JwtAuthServiceProvider"
+                "Kostyap\\JWTAuth\\Providers\\JwtAuthServiceProvider"
             ]
         }
     }

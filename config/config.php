@@ -8,7 +8,7 @@ return [
         'private' => env('JWT_PRIVATE_KEY'),
     ],
 
-    'algo' => env('JWT_ALGO', \Kostyap\JwtAuth\JWTSigner::ALGO_HS256),
+    'algo' => env('JWT_ALGO', \Kostyap\JwtAuth\Jwt\Generation\JWTSigner::ALGO_HS256),
 
     'required_claims' => [
         'iss',
