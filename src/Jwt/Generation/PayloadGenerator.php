@@ -29,6 +29,7 @@ class PayloadGenerator
      */
     public function getBuilderWithClaims(JWTSubject $subject): Builder
     {
+        //TODO: don't create new Builder here
         $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
 
         foreach ($this->claims as $claim) {
