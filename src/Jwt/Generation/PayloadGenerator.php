@@ -13,7 +13,7 @@ use Lcobucci\JWT\Token\RegisteredClaims;
 
 class PayloadGenerator
 {
-    private const CARBON_TIMEZONE = 'UTC';
+    public const CARBON_TIMEZONE = 'UTC';
 
     private array $claims;
     private int $ttl;

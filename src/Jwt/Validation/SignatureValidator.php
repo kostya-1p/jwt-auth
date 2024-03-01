@@ -18,7 +18,7 @@ class SignatureValidator
     }
 
     /** @throws RequiredConstraintsViolated */
-    public function checkSignature(Token $token): void
+    public function validateSignature(Token $token): void
     {
         //TODO: don't create new validator instance here
         $validator = new Validator();
