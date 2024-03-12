@@ -12,7 +12,7 @@ use Lcobucci\JWT\UnencryptedToken;
 use Lcobucci\JWT\Validation\Constraint\PermittedFor;
 use Lcobucci\JWT\Validation\Constraint\RelatedTo;
 use Lcobucci\JWT\Validation\Constraint\StrictValidAt;
-use Lcobucci\JWT\Validation\ConstraintViolation;
+use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
 use Lcobucci\JWT\Validation\Validator;
 
 class PayloadValidator
@@ -26,7 +26,7 @@ class PayloadValidator
 
     /**
      * @throws InvalidClaimsException
-     * @throws ConstraintViolation
+     * @throws RequiredConstraintsViolated
      */
     public function validatePayload(UnencryptedToken $token, JWTSubject $subject): void
     {
@@ -39,7 +39,7 @@ class PayloadValidator
     }
 
     /**
-     * @throws ConstraintViolation
+     * @throws RequiredConstraintsViolated
      */
     private function validateTokenTime(Validator $validator, UnencryptedToken $token): void
     {
@@ -51,7 +51,7 @@ class PayloadValidator
 
     /**
      * @throws InvalidClaimsException
-     * @throws ConstraintViolation
+     * @throws RequiredConstraintsViolated
      */
     private function validateDefaultClaims(Validator $validator, UnencryptedToken $token, JWTSubject $subject): void
     {
