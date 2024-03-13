@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\RefreshTokens;
+namespace Kostyap\JwtAuth\RefreshToken\Data;
 
 use Carbon\Carbon;
 
@@ -12,7 +12,7 @@ class RefreshSessionData
     public string $fingerPrint;
     public string $ip;
     public Carbon $expiresIn;
-    public Carbon $createdAt;
+    public ?Carbon $createdAt;
 
     public static function make(
         ?int $id,
@@ -21,7 +21,7 @@ class RefreshSessionData
         string $fingerPrint,
         string $ip,
         Carbon $expiresIn,
-        Carbon $createdAt
+        ?Carbon $createdAt
     ): RefreshSessionData {
         $dto = new self();
         $dto->id = $id;

@@ -1,11 +1,11 @@
 <?php
 
-namespace Kostyap\JwtAuth\RefreshTokens\Repository;
+namespace Kostyap\JwtAuth\RefreshToken\Repository;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
-use Kostyap\JwtAuth\RefreshTokens\RefreshSessionData;
+use Kostyap\JwtAuth\RefreshToken\Data\RefreshSessionData;
 
 class DatabaseRefreshSessionRepository implements RefreshSessionRepository
 {
@@ -23,15 +23,13 @@ class DatabaseRefreshSessionRepository implements RefreshSessionRepository
         return RefreshSessionData::fromStdClass($refreshSession);
     }
 
-    public function store(RefreshSessionData $refreshSession): RefreshSessionData
+    public function store(RefreshSessionData $refreshSession): bool
     {
-        $session = $refreshSession->toArray();
-        $session['expires_in'] = $refreshSession->expiresIn->unix();
+        $refreshSessionArray = $refreshSession->toArray();
+        $refreshSessionArray['expires_in'] = $refreshSession->expiresIn->unix();
+        $refreshSessionArray = array_filter($refreshSessionArray);
 
-        DB::table(self::TABLE_NAME)
-            ->insert($session);
-
-
+        return DB::table(self::TABLE_NAME)->insert($refreshSessionArray);
     }
 
     public function delete(RefreshSessionData $refreshSession): bool
