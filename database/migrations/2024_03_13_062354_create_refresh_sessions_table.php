@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
 
 return new class extends Migration {
     public function up(): void
@@ -16,7 +17,7 @@ return new class extends Migration {
             $table->string('ip', 15);
             $table->bigInteger('expires_in');
 
-            $table->timestampTz('created_at')->default(Carbon::now());
+            $table->timestampTz('created_at')->default(Carbon::now(PayloadGenerator::CARBON_TIMEZONE));
         });
     }
 

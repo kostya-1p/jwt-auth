@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class RefreshSessionData
 {
-    public int $id;
+    public ?int $id;
     public string $refreshToken;
     public string $userAgent;
     public string $fingerPrint;
@@ -15,7 +15,7 @@ class RefreshSessionData
     public Carbon $createdAt;
 
     public static function make(
-        int $id,
+        ?int $id,
         string $refreshToken,
         string $userAgent,
         string $fingerPrint,
@@ -45,5 +45,18 @@ class RefreshSessionData
         $dto->expiresIn = $refreshSession->expires_in;
         $dto->createdAt = $refreshSession->created_at;
         return $dto;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'refresh_token' => $this->refreshToken,
+            'user_agent' => $this->userAgent,
+            'fingerprint' => $this->fingerPrint,
+            'ip' => $this->ip,
+            'expires_in' => $this->expiresIn,
+            'created_at' => $this->createdAt,
+        ];
     }
 }
