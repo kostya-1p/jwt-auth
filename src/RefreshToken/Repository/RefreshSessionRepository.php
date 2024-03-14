@@ -6,7 +6,7 @@ use Kostyap\JwtAuth\RefreshToken\Data\RefreshSessionData;
 
 interface RefreshSessionRepository
 {
-    public function getByRefreshToken(string $refreshToken): RefreshSessionData;
+    public function getByRefreshToken(string $refreshToken): ?RefreshSessionData;
 
     public function store(RefreshSessionData $refreshSession): bool;
 

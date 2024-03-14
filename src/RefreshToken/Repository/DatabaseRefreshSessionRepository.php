@@ -11,11 +11,15 @@ class DatabaseRefreshSessionRepository implements RefreshSessionRepository
 {
     private const TABLE_NAME = 'refresh_sessions';
 
-    public function getByRefreshToken(string $refreshToken): RefreshSessionData
+    public function getByRefreshToken(string $refreshToken): ?RefreshSessionData
     {
         $refreshSession = DB::table(self::TABLE_NAME)
             ->where('refresh_token', $refreshToken)
             ->first();
+
+        if (is_null($refreshSession)) {
+            return null;
+        }
 
         $refreshSession->expires_in = Carbon::parse($refreshSession->expires_in, PayloadGenerator::CARBON_TIMEZONE);
         $refreshSession->created_at = Carbon::parse($refreshSession->created_at, PayloadGenerator::CARBON_TIMEZONE);
