@@ -11,6 +11,7 @@ use Kostyap\JwtAuth\Jwt\JWTSubject;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
 use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
+use Random\RandomException;
 
 class TokenRefresher
 {
@@ -27,12 +28,13 @@ class TokenRefresher
      * @throws InvalidRefreshSession
      * @throws InvalidClaimsException
      * @throws RequiredConstraintsViolated
+     * @throws RandomException
      */
     public function refresh(string $accessToken, string $refreshToken, RefreshMetaData $refreshMetaData): TokenPair
     {
         $this->jwtValidator->validateToken($accessToken, $this->subject);
 
-        $refreshSession = $this->refreshUtility->checkToken($refreshMetaData, $refreshToken);
+        $refreshSession = $this->refreshUtility->validateToken($refreshMetaData, $refreshToken);
         $this->refreshUtility->invalidateRefreshSession($refreshSession);
         $newRefreshSession = $this->refreshUtility->generateToken($refreshMetaData);
 
@@ -40,5 +42,15 @@ class TokenRefresher
         $newRefreshToken = $newRefreshSession->refreshToken;
 
         return TokenPair::make($newAccessToken, $newRefreshToken);
+    }
+
+    /**
+     * @throws InvalidRefreshSession
+     * @throws RandomException
+     */
+    public function generateToken(RefreshMetaData $refreshMetaData): string
+    {
+        $refreshSession = $this->refreshUtility->generateToken($refreshMetaData);
+        return $refreshSession->refreshToken;
     }
 }

@@ -9,6 +9,7 @@ use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
 use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
 use Kostyap\JwtAuth\RefreshToken\Data\RefreshSessionData;
 use Kostyap\JwtAuth\RefreshToken\Repository\RefreshSessionRepository;
+use Random\RandomException;
 
 class RefreshUtility
 {
@@ -25,7 +26,7 @@ class RefreshUtility
      * @throws TokenExpiredException
      * @throws InvalidRefreshSession
      */
-    public function checkToken(RefreshMetaData $refreshMetaData, string $refreshToken): RefreshSessionData
+    public function validateToken(RefreshMetaData $refreshMetaData, string $refreshToken): RefreshSessionData
     {
         $refreshSession = $this->refreshSessionRepository->getByRefreshToken($refreshToken);
         if (is_null($refreshSession)) {
@@ -34,6 +35,7 @@ class RefreshUtility
 
         $currentTime = Carbon::now(PayloadGenerator::CARBON_TIMEZONE);
         if ($currentTime->gte($refreshSession->expiresIn)) {
+            $this->invalidateRefreshSession($refreshSession);
             throw new TokenExpiredException('Refresh token expired');
         }
 
@@ -46,6 +48,7 @@ class RefreshUtility
 
     /**
      * @throws InvalidRefreshSession
+     * @throws RandomException
      */
     public function generateToken(RefreshMetaData $refreshMetaData): RefreshSessionData
     {
