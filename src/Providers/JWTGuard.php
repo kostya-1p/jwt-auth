@@ -6,15 +6,26 @@ use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Http\Request;
+use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 use Kostyap\JwtAuth\Jwt\JWTSubject;
+use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
+use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
+use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
+use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
+use Throwable;
 
 class JWTGuard implements Guard
 {
     use GuardHelpers;
 
     public function __construct(
-        private JWTGenerator $jwt,
+        private JWTGenerator $jwtGenerator,
+        private JWTValidator $validator,
+        private JWTParser $parser,
+        private Request $request,
+        private TokenRefresher $refresher,
         UserProvider $provider,
     ) {
         $this->provider = $provider;
@@ -23,13 +34,28 @@ class JWTGuard implements Guard
     /**
      * @inheritDoc
      */
-    public function user()
+    public function user(): JWTSubject|Authenticatable|null
     {
         if ($this->user !== null) {
             return $this->user;
         }
 
-        //TODO: Get user from token
+        /** @var string $token */
+        $token = $this->request->input('access_token');
+
+        try {
+            $parsedToken = $this->parser->parse($token);
+            $userId = $this->parser->getClaim($parsedToken, 'sub');
+
+            /** @var Authenticatable|JWTSubject|null $user */
+            $user = $this->provider->retrieveById($userId);
+
+            $this->validator->validateToken($token, $user);
+            $this->user = $user;
+        } catch (Throwable) {
+            return null;
+        }
+
         return $this->user;
     }
 
@@ -41,7 +67,7 @@ class JWTGuard implements Guard
         return (bool)$this->attempt($credentials, false);
     }
 
-    public function attempt(array $credentials = [], bool $login = true): bool|string
+    public function attempt(array $credentials = [], bool $login = true): bool|TokenPair
     {
         /** @var Authenticatable|JWTSubject|null $user */
         $user = $this->provider->retrieveByCredentials($credentials);
@@ -53,9 +79,19 @@ class JWTGuard implements Guard
         return false;
     }
 
-    public function login(JWTSubject $user): string
+    //TODO: Доработать этот метод (что делать с исключениями, что делать если данные для refreshMetadata не все)
+    public function login(JWTSubject $user): TokenPair
     {
-        return $this->jwt->fromSubject($user);
+        $accessToken = $this->jwtGenerator->fromSubject($user);
+
+        $ip = $this->request->ip();
+        $userAgent = $this->request->userAgent();
+        $fingerPrint = $this->request->input('fingerprint');
+
+        $refreshMetaData = RefreshMetaData::make($userAgent, $fingerPrint, $ip);
+
+        $refreshToken = $this->refresher->generateToken($refreshMetaData);
+        return TokenPair::make($accessToken, $refreshToken);
     }
 
     protected function hasValidCredentials(?Authenticatable $user, array $credentials): bool
