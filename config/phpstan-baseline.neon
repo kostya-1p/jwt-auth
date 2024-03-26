@@ -1,0 +1,21 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$token of method Kostyap\\\\JwtAuth\\\\Jwt\\\\Validation\\\\PayloadValidator\\:\\:validatePayload\\(\\) expects Lcobucci\\\\JWT\\\\UnencryptedToken, Lcobucci\\\\JWT\\\\Token given\\.$#"
+			count: 1
+			path: ../src/Jwt/Validation/JWTValidator.php
+
+		-
+			message: "#^Parameter \\#1 \\$token of method Kostyap\\\\JwtAuth\\\\Jwt\\\\Parsing\\\\JWTParser\\:\\:getClaim\\(\\) expects Lcobucci\\\\JWT\\\\UnencryptedToken, Lcobucci\\\\JWT\\\\Token given\\.$#"
+			count: 1
+			path: ../src/Providers/JWTGuard.php
+
+		-
+			message: "#^Class Kostyap\\\\JwtAuth\\\\Providers\\\\JWTGuard constructor invoked with 2 parameters, 6 required\\.$#"
+			count: 1
+			path: ../src/Providers/JwtAuthServiceProvider.php
+
+		-
+			message: "#^Parameter \\#2 \\$validator of class Kostyap\\\\JwtAuth\\\\Providers\\\\JWTGuard constructor expects Kostyap\\\\JwtAuth\\\\Jwt\\\\Validation\\\\JWTValidator, Illuminate\\\\Contracts\\\\Auth\\\\UserProvider\\|null given\\.$#"
+			count: 1
+			path: ../src/Providers/JwtAuthServiceProvider.php

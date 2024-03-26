@@ -11,7 +11,7 @@ class JWTParser
 {
     private Parser $parser;
 
-    public function __construct(Parser $parser)
+    public function __construct()
     {
         //TODO: Don't create parser here
         $this->parser = new Parser(new JoseEncoder());
