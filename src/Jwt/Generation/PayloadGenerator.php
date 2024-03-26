@@ -33,7 +33,7 @@ class PayloadGenerator
         $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
 
         foreach ($this->claims as $claim) {
-            match ($claim) {
+            $tokenBuilder = match ($claim) {
                 RegisteredClaims::ISSUED_AT => $tokenBuilder->issuedAt($this->iat()),
 
                 RegisteredClaims::EXPIRATION_TIME => $tokenBuilder->expiresAt($this->exp()),
@@ -55,7 +55,7 @@ class PayloadGenerator
         $customClaims = $subject->getJWTCustomClaims();
 
         foreach ($customClaims as $key => $value) {
-            $tokenBuilder->withClaim($key, $value);
+            $tokenBuilder = $tokenBuilder->withClaim($key, $value);
         }
 
         return $tokenBuilder;
