@@ -19,7 +19,6 @@ class TokenRefresher
     public function __construct(
         private JWTValidator $jwtValidator,
         private JWTGenerator $jwtGenerator,
-        private JWTSubject $subject,
         private RefreshUtility $refreshUtility,
     ) {
     }
@@ -32,15 +31,15 @@ class TokenRefresher
      * @throws RandomException
      * @throws JWTException
      */
-    public function refresh(string $accessToken, string $refreshToken, RefreshMetaData $refreshMetaData): TokenPair
+    public function refresh(TokenPair $tokenPair, RefreshMetaData $refreshMetaData, JWTSubject $subject): TokenPair
     {
-        $this->jwtValidator->validateToken($accessToken, $this->subject);
+        $this->jwtValidator->validateToken($tokenPair->accessToken, $subject);
 
-        $refreshSession = $this->refreshUtility->validateToken($refreshMetaData, $refreshToken);
+        $refreshSession = $this->refreshUtility->validateToken($refreshMetaData, $tokenPair->refreshToken);
         $this->refreshUtility->invalidateRefreshSession($refreshSession);
         $newRefreshSession = $this->refreshUtility->generateToken($refreshMetaData);
 
-        $newAccessToken = $this->jwtGenerator->fromSubject($this->subject);
+        $newAccessToken = $this->jwtGenerator->fromSubject($subject);
         $newRefreshToken = $newRefreshSession->refreshToken;
 
         return TokenPair::make($newAccessToken, $newRefreshToken);
