@@ -35,7 +35,7 @@ class PayloadValidator
 
         $this->validateTokenTime($validator, $token);
         $this->validateDefaultClaims($validator, $token, $subject);
-        $this->validateCustomClaims($validator, $token, $subject);
+        $this->validateCustomClaims($token, $subject);
     }
 
     /**
@@ -66,6 +66,8 @@ class PayloadValidator
             match ($claim) {
                 RegisteredClaims::AUDIENCE => $validator->assert($token, new PermittedFor($this->getCurrentHost())),
                 RegisteredClaims::SUBJECT => $validator->assert($token, new RelatedTo($subject->getJWTIdentifier())),
+                RegisteredClaims::ISSUER, RegisteredClaims::ISSUED_AT, RegisteredClaims::EXPIRATION_TIME,
+                RegisteredClaims::NOT_BEFORE, RegisteredClaims::ID => null,
                 default => throw new InvalidClaimsException('Unexpected JWT default claim'),
             };
         }
@@ -74,7 +76,7 @@ class PayloadValidator
     /**
      * @throws InvalidClaimsException
      */
-    private function validateCustomClaims(Validator $validator, UnencryptedToken $token, JWTSubject $subject): void
+    private function validateCustomClaims(UnencryptedToken $token, JWTSubject $subject): void
     {
         $tokenClaims = $token->claims();
         $customClaims = $subject->getJWTCustomClaims();
