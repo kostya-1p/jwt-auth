@@ -4,6 +4,7 @@ namespace Kostyap\JwtAuth\RefreshToken;
 
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
+use Kostyap\JwtAuth\Exceptions\JWTException;
 use Kostyap\JwtAuth\Exceptions\TokenExpiredException;
 use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
@@ -29,6 +30,7 @@ class TokenRefresher
      * @throws InvalidClaimsException
      * @throws RequiredConstraintsViolated
      * @throws RandomException
+     * @throws JWTException
      */
     public function refresh(string $accessToken, string $refreshToken, RefreshMetaData $refreshMetaData): TokenPair
     {

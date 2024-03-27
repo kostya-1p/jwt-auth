@@ -3,6 +3,7 @@
 namespace Kostyap\JwtAuth\Jwt\Validation;
 
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
+use Kostyap\JwtAuth\Exceptions\JWTException;
 use Kostyap\JwtAuth\Jwt\JWTSubject;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token\Parser;
@@ -19,6 +20,7 @@ class JWTValidator
     /**
      * @throws InvalidClaimsException
      * @throws RequiredConstraintsViolated
+     * @throws JWTException
      */
     public function validateToken(string $token, JWTSubject $subject): void
     {
