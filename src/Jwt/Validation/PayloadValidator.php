@@ -81,9 +81,9 @@ class PayloadValidator
         $tokenClaims = $token->claims();
         $customClaims = $subject->getJWTCustomClaims();
 
-        foreach ($customClaims as $claim) {
-            if (!$tokenClaims->has($claim)) {
-                throw new InvalidClaimsException('Token payload does not contain custom claim: ' . $claim);
+        foreach ($customClaims as $key => $claim) {
+            if (!$tokenClaims->has($key)) {
+                throw new InvalidClaimsException('Token payload does not contain custom claim ' . $claim . ' with key ' . $key);
             }
         }
     }
