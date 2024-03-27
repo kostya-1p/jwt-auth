@@ -2,7 +2,8 @@
 
 namespace Kostyap\JwtAuth\Jwt\Validation;
 
-use Kostyap\JwtAuth\Exceptions\JWTException;
+use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
+use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
 use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
@@ -18,7 +19,8 @@ class SignatureValidator
 
     /**
      * @throws RequiredConstraintsViolated
-     * @throws JWTException
+     * @throws SignatureAlgorithmException
+     * @throws SignatureKeyException
      */
     public function validateSignature(Token $token): void
     {

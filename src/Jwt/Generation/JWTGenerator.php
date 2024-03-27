@@ -2,6 +2,9 @@
 
 namespace Kostyap\JwtAuth\Jwt\Generation;
 
+use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
+use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
+use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Kostyap\JwtAuth\Jwt\JWTSubject;
 
 class JWTGenerator
@@ -12,6 +15,11 @@ class JWTGenerator
     ) {
     }
 
+    /**
+     * @throws SignatureAlgorithmException
+     * @throws SignatureKeyException
+     * @throws InvalidClaimsException
+     */
     public function fromSubject(JWTSubject $subject): string
     {
         $algorithm = $this->signer->getJWTSigner();

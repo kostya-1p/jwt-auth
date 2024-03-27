@@ -2,7 +2,8 @@
 
 namespace Kostyap\JwtAuth\Jwt\Generation;
 
-use Kostyap\JwtAuth\Exceptions\JWTException;
+use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
+use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Ecdsa;
 use Lcobucci\JWT\Signer\Key;
@@ -51,7 +52,7 @@ class JWTSigner
     public function getJWTSigner(): Signer
     {
         if (!array_key_exists($this->algo, $this->signers)) {
-            throw new JWTException('The given algorithm could not be found');
+            throw new SignatureAlgorithmException('The given algorithm could not be found');
         }
 
         $signer = $this->signers[$this->algo];
@@ -63,14 +64,14 @@ class JWTSigner
     {
         if ($this->isAsymmetric()) {
             if (!$this->privateKey) {
-                throw new JWTException('Private key is not set.');
+                throw new SignatureKeyException('Private key is not set.');
             }
 
             return $this->getKey($this->privateKey);
         }
 
         if (!$this->secret) {
-            throw new JWTException('Secret is not set.');
+            throw new SignatureKeyException('Secret key is not set.');
         }
 
         return $this->getKey($this->secret);
@@ -80,14 +81,14 @@ class JWTSigner
     {
         if ($this->isAsymmetric()) {
             if (!$this->publicKey) {
-                throw new JWTException('Public key is not set.');
+                throw new SignatureKeyException('Public key is not set.');
             }
 
             return $this->getKey($this->publicKey);
         }
 
         if (!$this->secret) {
-            throw new JWTException('Secret is not set.');
+            throw new SignatureKeyException('Secret key is not set.');
         }
 
         return $this->getKey($this->secret);
