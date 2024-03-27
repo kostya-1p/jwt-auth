@@ -9,6 +9,7 @@ use Kostyap\JwtAuth\Jwt\JWTSubject;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token\Builder;
+use Lcobucci\JWT\Builder as BuilderInterface;
 use Lcobucci\JWT\Token\RegisteredClaims;
 
 class PayloadGenerator
@@ -27,7 +28,7 @@ class PayloadGenerator
     /**
      * @throws InvalidClaimsException
      */
-    public function getBuilderWithClaims(JWTSubject $subject): Builder
+    public function getBuilderWithClaims(JWTSubject $subject): BuilderInterface
     {
         //TODO: don't create new Builder here
         $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
