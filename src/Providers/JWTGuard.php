@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
+use Kostyap\JwtAuth\Helpers\TypeValidator;
 use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 use Kostyap\JwtAuth\Jwt\JWTSubject;
@@ -45,6 +46,7 @@ class JWTGuard implements Guard
 
         try {
             $parsedToken = $this->parser->parse($token);
+            $parsedToken = TypeValidator::checkUnencryptedTokenType($parsedToken);
             $userId = $this->parser->getClaim($parsedToken, 'sub');
 
             /** @var Authenticatable|JWTSubject|null $user */

@@ -6,6 +6,7 @@ use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
 use Kostyap\JwtAuth\Exceptions\JWTException;
 use Kostyap\JwtAuth\Exceptions\TokenExpiredException;
+use Kostyap\JwtAuth\Exceptions\TokenTypeException;
 use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 use Kostyap\JwtAuth\Jwt\JWTSubject;
@@ -30,6 +31,7 @@ class TokenRefresher
      * @throws RequiredConstraintsViolated
      * @throws RandomException
      * @throws JWTException
+     * @throws TokenTypeException
      */
     public function refresh(TokenPair $tokenPair, RefreshMetaData $refreshMetaData, JWTSubject $subject): TokenPair
     {

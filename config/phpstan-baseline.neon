@@ -1,12 +1,2 @@
 parameters:
 	ignoreErrors:
-		-
-			message: "#^Parameter \\#1 \\$token of method Kostyap\\\\JwtAuth\\\\Jwt\\\\Validation\\\\PayloadValidator\\:\\:validatePayload\\(\\) expects Lcobucci\\\\JWT\\\\UnencryptedToken, Lcobucci\\\\JWT\\\\Token given\\.$#"
-			count: 1
-			path: ../src/Jwt/Validation/JWTValidator.php
-
-		-
-			message: "#^Parameter \\#1 \\$token of method Kostyap\\\\JwtAuth\\\\Jwt\\\\Parsing\\\\JWTParser\\:\\:getClaim\\(\\) expects Lcobucci\\\\JWT\\\\UnencryptedToken, Lcobucci\\\\JWT\\\\Token given\\.$#"
-			count: 1
-			path: ../src/Providers/JWTGuard.php
-
