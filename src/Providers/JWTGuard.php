@@ -2,6 +2,7 @@
 
 namespace Kostyap\JwtAuth\Providers;
 
+use Exception;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
@@ -22,7 +23,6 @@ use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
 use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
 use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
 use Random\RandomException;
-use Throwable;
 
 class JWTGuard implements Guard
 {
@@ -47,19 +47,17 @@ class JWTGuard implements Guard
         if ($this->user !== null) {
             return $this->user;
         }
-        $token = $this->request->bearerToken();
 
         try {
-            $parsedToken = $this->parser->parse($token);
-            $parsedToken = TypeValidator::checkUnencryptedTokenType($parsedToken);
-            $userId = $this->parser->getClaim($parsedToken, 'sub');
-
-            /** @var Authenticatable|JWTSubject|null $user */
-            $user = $this->provider->retrieveById($userId);
+            $token = $this->getAccessToken();
+            $user = $this->getUserFromToken($token);
+            if (is_null($user)) {
+                throw new InvalidTokenException('Could not get user from token');
+            }
 
             $this->validator->validateToken($token, $user);
             $this->user = $user;
-        } catch (Throwable) {
+        } catch (Exception) {
             return null;
         }
 
@@ -80,6 +78,7 @@ class JWTGuard implements Guard
      * @throws SignatureKeyException
      * @throws InvalidRefreshSession
      * @throws InvalidClaimsException
+     * @throws RequestInputException
      */
     public function attempt(array $credentials = [], bool $login = true): bool|TokenPair
     {
@@ -99,17 +98,12 @@ class JWTGuard implements Guard
      * @throws SignatureKeyException
      * @throws InvalidRefreshSession
      * @throws InvalidClaimsException
+     * @throws RequestInputException
      */
     public function login(JWTSubject $user): TokenPair
     {
         $accessToken = $this->jwtGenerator->fromSubject($user);
-
-        $ip = $this->request->ip();
-        $userAgent = $this->request->userAgent();
-        $fingerPrint = $this->request->input('fingerprint');
-
-        $refreshMetaData = RefreshMetaData::make($userAgent, $fingerPrint, $ip);
-
+        $refreshMetaData = $this->getRefreshMetaData();
         $refreshToken = $this->refresher->generateToken($refreshMetaData);
         return TokenPair::make($accessToken, $refreshToken);
     }
@@ -160,6 +154,18 @@ class JWTGuard implements Guard
         }
 
         return TokenPair::make($accessToken, $refreshToken);
+    }
+
+    /**
+     * @throws InvalidTokenException
+     */
+    private function getAccessToken(): string
+    {
+        $accessToken = $this->request->bearerToken();
+        if (!$accessToken) {
+            throw new InvalidTokenException('Token is missing!');
+        }
+        return $accessToken;
     }
 
     private function getUserFromToken(string $token): Authenticatable|JWTSubject|null
