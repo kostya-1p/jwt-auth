@@ -7,6 +7,10 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
+use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
+use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
+use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
+use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Kostyap\JwtAuth\Helpers\TypeValidator;
 use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
@@ -15,6 +19,7 @@ use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
 use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
 use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
+use Random\RandomException;
 use Throwable;
 
 class JWTGuard implements Guard
@@ -40,9 +45,7 @@ class JWTGuard implements Guard
         if ($this->user !== null) {
             return $this->user;
         }
-
-        /** @var string $token */
-        $token = $this->request->input('access_token');
+        $token = $this->request->bearerToken();
 
         try {
             $parsedToken = $this->parser->parse($token);
@@ -69,6 +72,13 @@ class JWTGuard implements Guard
         return (bool)$this->attempt($credentials, false);
     }
 
+    /**
+     * @throws SignatureAlgorithmException
+     * @throws RandomException
+     * @throws SignatureKeyException
+     * @throws InvalidRefreshSession
+     * @throws InvalidClaimsException
+     */
     public function attempt(array $credentials = [], bool $login = true): bool|TokenPair
     {
         /** @var Authenticatable|JWTSubject|null $user */
@@ -81,7 +91,13 @@ class JWTGuard implements Guard
         return false;
     }
 
-    //TODO: Доработать этот метод (что делать с исключениями, что делать если данные для refreshMetadata не все)
+    /**
+     * @throws SignatureAlgorithmException
+     * @throws RandomException
+     * @throws SignatureKeyException
+     * @throws InvalidRefreshSession
+     * @throws InvalidClaimsException
+     */
     public function login(JWTSubject $user): TokenPair
     {
         $accessToken = $this->jwtGenerator->fromSubject($user);
