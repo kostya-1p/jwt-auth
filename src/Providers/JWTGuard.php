@@ -9,6 +9,8 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
+use Kostyap\JwtAuth\Exceptions\InvalidTokenException;
+use Kostyap\JwtAuth\Exceptions\RequestInputException;
 use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Kostyap\JwtAuth\Helpers\TypeValidator;
@@ -115,5 +117,57 @@ class JWTGuard implements Guard
     protected function hasValidCredentials(?Authenticatable $user, array $credentials): bool
     {
         return $user !== null && $this->provider->validateCredentials($user, $credentials);
+    }
+
+    public function refresh(): TokenPair
+    {
+        $tokenPair = $this->getTokenPair();
+        $refreshMetaData = $this->getRefreshMetaData();
+
+        $user = $this->getUserFromToken($tokenPair->accessToken);
+        if (is_null($user)) {
+            throw new InvalidTokenException('Could not get user from token');
+        }
+
+        return $this->refresher->refresh($tokenPair, $refreshMetaData, $user);
+    }
+
+    /**
+     * @throws RequestInputException
+     */
+    private function getRefreshMetaData(): RefreshMetaData
+    {
+        $ip = $this->request->ip();
+        $userAgent = $this->request->userAgent();
+        $fingerPrint = $this->request->input('fingerprint');
+
+        if (!$fingerPrint) {
+            throw new RequestInputException('Fingerprint is required!');
+        }
+        return RefreshMetaData::make($userAgent, $fingerPrint, $ip);
+    }
+
+    /**
+     * @throws InvalidTokenException
+     */
+    private function getTokenPair(): TokenPair
+    {
+        $accessToken = $this->request->bearerToken();
+        $refreshToken = $this->request->cookie('refresh_token');
+
+        if (is_null($accessToken) || is_null($refreshToken)) {
+            throw new InvalidTokenException('Token is missing!');
+        }
+
+        return TokenPair::make($accessToken, $refreshToken);
+    }
+
+    private function getUserFromToken(string $token): Authenticatable|JWTSubject|null
+    {
+        $parsedToken = $this->parser->parse($token);
+        $parsedToken = TypeValidator::checkUnencryptedTokenType($parsedToken);
+        $userId = $this->parser->getClaim($parsedToken, 'sub');
+
+        return $this->provider->retrieveById($userId);
     }
 }
