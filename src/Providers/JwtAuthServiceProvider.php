@@ -31,6 +31,7 @@ class JwtAuthServiceProvider extends ServiceProvider
 
         $this->extendAuthGuard();
 
+        //TODO: Use command instead of just copying
         $this->copyDefaultImplementationFiles();
     }
 
