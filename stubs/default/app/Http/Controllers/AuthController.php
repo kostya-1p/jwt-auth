@@ -30,6 +30,17 @@ class AuthController extends Controller
         ]);
     }
 
+    public function me(): Response
+    {
+        $user = Auth::user();
+        if (is_null($user)) {
+            return new Response(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        //TODO: Use a http resource instead of an explicit JSON model
+        return new Response($user);
+    }
+
     public function refresh(): Response
     {
         try {
