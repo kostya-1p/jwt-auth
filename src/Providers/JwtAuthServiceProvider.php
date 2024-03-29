@@ -18,10 +18,10 @@ class JwtAuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../config/config.php' => config_path(self::CONFIG_NAME),
+            __DIR__ . '/../../config/config.php' => config_path(self::CONFIG_NAME),
             'config'
         ]);
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
 
         $this->extendAuthGuard();
     }
