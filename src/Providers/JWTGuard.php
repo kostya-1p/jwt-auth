@@ -14,6 +14,8 @@ use Kostyap\JwtAuth\Exceptions\InvalidTokenException;
 use Kostyap\JwtAuth\Exceptions\RequestInputException;
 use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
+use Kostyap\JwtAuth\Exceptions\TokenExpiredException;
+use Kostyap\JwtAuth\Exceptions\TokenTypeException;
 use Kostyap\JwtAuth\Helpers\TypeValidator;
 use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
@@ -113,6 +115,17 @@ class JWTGuard implements Guard
         return $user !== null && $this->provider->validateCredentials($user, $credentials);
     }
 
+    /**
+     * @throws SignatureAlgorithmException
+     * @throws RandomException
+     * @throws InvalidTokenException
+     * @throws SignatureKeyException
+     * @throws InvalidRefreshSession
+     * @throws TokenExpiredException
+     * @throws TokenTypeException
+     * @throws RequestInputException
+     * @throws InvalidClaimsException
+     */
     public function refresh(): TokenPair
     {
         $tokenPair = $this->getTokenPair();

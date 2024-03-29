@@ -17,11 +17,26 @@ class AuthController extends Controller
             /** @var bool|TokenPair $tokenPair */
             $tokenPair = Auth::attempt($request->validated());
         } catch (Exception $e) {
-            return new Response($e->getMessage(), 401);
+            return new Response(['error' => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
         }
 
         if (!$tokenPair) {
-            return new Response(['error' => 'Unauthorized'], 401);
+            return new Response(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return new Response([
+            'access_token' => $tokenPair->accessToken,
+            'refresh_token' => $tokenPair->refreshToken
+        ]);
+    }
+
+    public function refresh(): Response
+    {
+        try {
+            /** @var TokenPair $tokenPair */
+            $tokenPair = Auth::refresh();
+        } catch (Exception $e) {
+            return new Response(['error' => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
         }
 
         return new Response([
