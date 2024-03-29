@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\LoginApiRequest;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 
-class AuthController extends Controller
+class AuthApiController extends Controller
 {
-    public function login(LoginRequest $request): Response
+    public function login(LoginApiRequest $request): Response
     {
         try {
             /** @var bool|TokenPair $tokenPair */

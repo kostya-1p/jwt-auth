@@ -3,6 +3,7 @@
 namespace Kostyap\JwtAuth\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +30,8 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
         $this->extendAuthGuard();
+
+        $this->copyDefaultImplementationFiles();
     }
 
     protected function extendAuthGuard(): void
@@ -43,5 +46,25 @@ class JwtAuthServiceProvider extends ServiceProvider
                 Auth::createUserProvider($config['provider']),
             );
         });
+    }
+
+    protected function copyDefaultImplementationFiles(): void
+    {
+        // Routes
+        copy(__DIR__ . '/../../stubs/default/routes/auth.php', base_path('routes/auth.php'));
+
+        // Controllers
+        (new Filesystem)->ensureDirectoryExists(app_path('Http/Controllers'));
+        (new Filesystem)->copyDirectory(
+            __DIR__ . '/../../stubs/default/app/Http/Controllers',
+            app_path('Http/Controllers')
+        );
+
+        // Requests
+        (new Filesystem)->ensureDirectoryExists(app_path('Http/Requests'));
+        (new Filesystem)->copyDirectory(
+            __DIR__ . '/../../stubs/default/app/Http/Requests',
+            app_path('Http/Requests')
+        );
     }
 }
