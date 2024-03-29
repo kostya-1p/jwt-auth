@@ -9,19 +9,24 @@ use Illuminate\Support\ServiceProvider;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
+use Kostyap\JwtAuth\RefreshToken\Repository\DatabaseRefreshSessionRepository;
+use Kostyap\JwtAuth\RefreshToken\Repository\RefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
 
 class JwtAuthServiceProvider extends ServiceProvider
 {
     public const CONFIG_NAME = 'jwt.php';
 
+    public array $bindings = [
+        RefreshSessionRepository::class => DatabaseRefreshSessionRepository::class
+    ];
+
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../../config/config.php' => config_path(self::CONFIG_NAME),
-            'config'
+            __DIR__ . '/../../config/config.php' => config_path(self::CONFIG_NAME)
         ]);
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
         $this->extendAuthGuard();
     }
