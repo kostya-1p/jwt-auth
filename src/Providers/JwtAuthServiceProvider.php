@@ -7,6 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
@@ -45,6 +46,7 @@ class JwtAuthServiceProvider extends ServiceProvider
                 $app->make(Request::class),
                 $app->make(TokenRefresher::class),
                 Auth::createUserProvider($config['provider']),
+                $app->make(TokenRequestGetter::class),
             );
         });
     }
