@@ -2,6 +2,7 @@
 
 namespace Kostyap\JwtAuth\Helpers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Kostyap\JwtAuth\Enum\AccessTokenSource;
 use Kostyap\JwtAuth\Enum\RefreshTokenSource;
@@ -33,7 +34,7 @@ class TokenResponseSetter
             AccessTokenSource::Cookie => $response->withCookie(Cookie::create(
                 TokenRequestGetter::ACCESS_TOKEN_KEY,
                 $tokenPair->accessToken,
-                $this->ttl
+                Carbon::now()->addMinutes($this->ttl),
             )),
         };
 
@@ -42,7 +43,7 @@ class TokenResponseSetter
             RefreshTokenSource::Cookie => $response->withCookie(Cookie::create(
                 TokenRequestGetter::REFRESH_TOKEN_KEY,
                 $tokenPair->refreshToken,
-                $this->refreshTtl
+                Carbon::now()->addMinutes($this->refreshTtl),
             )),
         };
 
