@@ -37,7 +37,7 @@ class TokenRefresher
      */
     public function refresh(TokenPair $tokenPair, RefreshMetaData $refreshMetaData, JWTSubject $subject): TokenPair
     {
-        $this->jwtValidator->validateToken($tokenPair->accessToken, $subject);
+        $this->jwtValidator->validateExcludingTime($tokenPair->accessToken, $subject);
 
         $refreshSession = $this->refreshUtility->validateToken($refreshMetaData, $tokenPair->refreshToken);
         $this->refreshUtility->invalidateRefreshSession($refreshSession);

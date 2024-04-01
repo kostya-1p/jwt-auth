@@ -39,6 +39,18 @@ class PayloadValidator
     }
 
     /**
+     * @throws InvalidClaimsException
+     * @throws RequiredConstraintsViolated
+     */
+    public function validateExcludingTime(UnencryptedToken $token, JWTSubject $subject): void
+    {
+        $validator = new Validator();
+
+        $this->validateDefaultClaims($validator, $token, $subject);
+        $this->validateCustomClaims($token, $subject);
+    }
+
+    /**
      * @throws RequiredConstraintsViolated
      */
     private function validateTokenTime(Validator $validator, UnencryptedToken $token): void

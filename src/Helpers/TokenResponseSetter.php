@@ -13,14 +13,12 @@ class TokenResponseSetter
 {
     private AccessTokenSource $accessTokenSource;
     private RefreshTokenSource $refreshTokenSource;
-    private int $ttl;
     private int $refreshTtl;
 
     public function __construct()
     {
         $this->accessTokenSource = config('jwt.token_source.access_token');
         $this->refreshTokenSource = config('jwt.token_source.refresh_token');
-        $this->ttl = config('jwt.ttl');
         $this->refreshTtl = config('jwt.refresh_ttl');
     }
 
@@ -34,7 +32,7 @@ class TokenResponseSetter
             AccessTokenSource::Cookie => $response->withCookie(Cookie::create(
                 TokenRequestGetter::ACCESS_TOKEN_KEY,
                 $tokenPair->accessToken,
-                Carbon::now()->addMinutes($this->ttl),
+                Carbon::now()->addMinutes($this->refreshTtl),
             )),
         };
 

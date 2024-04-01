@@ -38,4 +38,22 @@ class JWTValidator
         $this->payloadValidator->validatePayload($token, $subject);
         $this->signatureValidator->validateSignature($token);
     }
+
+    /**
+     * @throws SignatureAlgorithmException
+     * @throws TokenTypeException
+     * @throws SignatureKeyException
+     * @throws InvalidClaimsException
+     * @throws RequiredConstraintsViolated
+     */
+    public function validateExcludingTime(string $token, JWTSubject $subject): void
+    {
+        $parser = new Parser(new JoseEncoder());
+
+        $token = $parser->parse($token);
+
+        $token = TypeValidator::checkUnencryptedTokenType($token);
+        $this->payloadValidator->validateExcludingTime($token, $subject);
+        $this->signatureValidator->validateSignature($token);
+    }
 }
