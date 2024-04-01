@@ -22,7 +22,6 @@ class LoginApiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fingerprint' => ['required', 'string', 'max:200'],
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
