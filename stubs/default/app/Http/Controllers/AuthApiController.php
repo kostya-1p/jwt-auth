@@ -51,6 +51,6 @@ class AuthApiController extends Controller
             return new Response(['error' => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
         }
 
-        return $this->tokenResponseSetter->setResponse($tokenPair);
+        return $this->tokenResponseSetter->setResponse($tokenPair, 'Refreshed');
     }
 }

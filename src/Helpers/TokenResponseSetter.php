@@ -24,7 +24,7 @@ class TokenResponseSetter
         $this->refreshTtl = config('jwt.refresh_ttl');
     }
 
-    public function setResponse(TokenPair $tokenPair): Response
+    public function setResponse(TokenPair $tokenPair, string $emptyBodyMessage = 'Authenticated'): Response
     {
         $response = new Response();
         $responseContent = [];
@@ -47,7 +47,7 @@ class TokenResponseSetter
             )),
         };
 
-        $response->setContent(empty($responseContent) ? 'Authenticated' : $responseContent);
+        $response->setContent(empty($responseContent) ? $emptyBodyMessage : $responseContent);
         return $response;
     }
 }
