@@ -3,7 +3,6 @@
 namespace Kostyap\JwtAuth\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -30,10 +29,13 @@ class JwtAuthServiceProvider extends ServiceProvider
         ]);
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
-        $this->extendAuthGuard();
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CopyDefaultController::class,
+            ]);
+        }
 
-        //TODO: Use command instead of just copying
-        $this->copyDefaultImplementationFiles();
+        $this->extendAuthGuard();
     }
 
     protected function extendAuthGuard(): void
@@ -49,25 +51,5 @@ class JwtAuthServiceProvider extends ServiceProvider
                 $app->make(TokenRequestGetter::class),
             );
         });
-    }
-
-    protected function copyDefaultImplementationFiles(): void
-    {
-        // Routes
-        copy(__DIR__ . '/../../stubs/default/routes/auth.php', base_path('routes/auth.php'));
-
-        // Controllers
-        (new Filesystem)->ensureDirectoryExists(app_path('Http/Controllers'));
-        (new Filesystem)->copyDirectory(
-            __DIR__ . '/../../stubs/default/app/Http/Controllers',
-            app_path('Http/Controllers')
-        );
-
-        // Requests
-        (new Filesystem)->ensureDirectoryExists(app_path('Http/Requests'));
-        (new Filesystem)->copyDirectory(
-            __DIR__ . '/../../stubs/default/app/Http/Requests',
-            app_path('Http/Requests')
-        );
     }
 }
