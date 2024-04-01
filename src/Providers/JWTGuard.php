@@ -18,6 +18,7 @@ use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Kostyap\JwtAuth\Exceptions\TokenExpiredException;
 use Kostyap\JwtAuth\Exceptions\TokenTypeException;
+use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Helpers\TypeValidator;
 use Kostyap\JwtAuth\Jwt\Data\TokenPair;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
@@ -33,9 +34,6 @@ class JWTGuard implements Guard
 {
     use GuardHelpers;
 
-    private AccessTokenSource $accessTokenSource;
-    private RefreshTokenSource $refreshTokenSource;
-
     public function __construct(
         private JWTGenerator $jwtGenerator,
         private JWTValidator $validator,
@@ -43,10 +41,9 @@ class JWTGuard implements Guard
         private Request $request,
         private TokenRefresher $refresher,
         UserProvider $provider,
+        private TokenRequestGetter $tokenRequestGetter,
     ) {
         $this->provider = $provider;
-        $this->accessTokenSource = config('jwt.token_source.access_token');
-        $this->refreshTokenSource = config('jwt.token_source.refresh_token');
     }
 
     /**
@@ -59,7 +56,7 @@ class JWTGuard implements Guard
         }
 
         try {
-            $token = $this->getAccessToken();
+            $token = $this->tokenRequestGetter->getAccessToken();
             $user = $this->getUserFromToken($token);
             if (is_null($user)) {
                 throw new InvalidTokenException('Could not get user from token');
@@ -167,42 +164,10 @@ class JWTGuard implements Guard
      */
     private function getTokenPair(): TokenPair
     {
-        $accessToken = $this->getAccessToken();
-        $refreshToken = $this->getRefreshToken();
+        $accessToken = $this->tokenRequestGetter->getAccessToken();
+        $refreshToken = $this->tokenRequestGetter->getRefreshToken();
 
         return TokenPair::make($accessToken, $refreshToken);
-    }
-
-    /**
-     * @throws InvalidTokenException
-     */
-    private function getAccessToken(): string
-    {
-        $accessToken = match ($this->accessTokenSource) {
-            AccessTokenSource::Bearer => $this->request->bearerToken(),
-            AccessTokenSource::Cookie => $this->request->cookie('access_token'),
-        };
-
-        if (!$accessToken) {
-            throw new InvalidTokenException('Token is missing!');
-        }
-        return $accessToken;
-    }
-
-    /**
-     * @throws InvalidTokenException
-     */
-    private function getRefreshToken(): string
-    {
-        $refreshToken = match ($this->refreshTokenSource) {
-            RefreshTokenSource::Body => $this->request->input('refresh_token'),
-            RefreshTokenSource::Cookie => $this->request->cookie('refresh_token'),
-        };
-
-        if (!$refreshToken) {
-            throw new InvalidTokenException('Token is missing!');
-        }
-        return $refreshToken;
     }
 
     private function getUserFromToken(string $token): Authenticatable|JWTSubject|null

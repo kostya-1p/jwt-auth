@@ -29,18 +29,18 @@ class TokenResponseSetter
         $responseContent = [];
 
         match ($this->accessTokenSource) {
-            AccessTokenSource::Bearer => $responseContent['access_token'] = $tokenPair->accessToken,
+            AccessTokenSource::Bearer => $responseContent[TokenRequestGetter::ACCESS_TOKEN_KEY] = $tokenPair->accessToken,
             AccessTokenSource::Cookie => $response->withCookie(Cookie::create(
-                'access_token',
+                TokenRequestGetter::ACCESS_TOKEN_KEY,
                 $tokenPair->accessToken,
                 $this->ttl
             )),
         };
 
         match ($this->refreshTokenSource) {
-            RefreshTokenSource::Body => $responseContent['refresh_token'] = $tokenPair->refreshToken,
+            RefreshTokenSource::Body => $responseContent[TokenRequestGetter::REFRESH_TOKEN_KEY] = $tokenPair->refreshToken,
             RefreshTokenSource::Cookie => $response->withCookie(Cookie::create(
-                'refresh_token',
+                TokenRequestGetter::REFRESH_TOKEN_KEY,
                 $tokenPair->refreshToken,
                 $this->refreshTtl
             )),
