@@ -8,6 +8,8 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
+use Kostyap\JwtAuth\Enum\AccessTokenSource;
+use Kostyap\JwtAuth\Enum\RefreshTokenSource;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
 use Kostyap\JwtAuth\Exceptions\InvalidTokenException;
@@ -24,11 +26,15 @@ use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
 use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
 use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
+use Lcobucci\JWT\Token\RegisteredClaims;
 use Random\RandomException;
 
 class JWTGuard implements Guard
 {
     use GuardHelpers;
+
+    private AccessTokenSource $accessTokenSource;
+    private RefreshTokenSource $refreshTokenSource;
 
     public function __construct(
         private JWTGenerator $jwtGenerator,
@@ -39,6 +45,8 @@ class JWTGuard implements Guard
         UserProvider $provider,
     ) {
         $this->provider = $provider;
+        $this->accessTokenSource = config('jwt.token_source.access_token');
+        $this->refreshTokenSource = config('jwt.token_source.refresh_token');
     }
 
     /**
@@ -159,12 +167,8 @@ class JWTGuard implements Guard
      */
     private function getTokenPair(): TokenPair
     {
-        $accessToken = $this->request->bearerToken();
-        $refreshToken = $this->request->cookie('refresh_token');
-
-        if (is_null($accessToken) || is_null($refreshToken)) {
-            throw new InvalidTokenException('Token is missing!');
-        }
+        $accessToken = $this->getAccessToken();
+        $refreshToken = $this->getRefreshToken();
 
         return TokenPair::make($accessToken, $refreshToken);
     }
@@ -174,18 +178,38 @@ class JWTGuard implements Guard
      */
     private function getAccessToken(): string
     {
-        $accessToken = $this->request->bearerToken();
+        $accessToken = match ($this->accessTokenSource) {
+            AccessTokenSource::Bearer => $this->request->bearerToken(),
+            AccessTokenSource::Cookie => $this->request->cookie('access_token'),
+        };
+
         if (!$accessToken) {
             throw new InvalidTokenException('Token is missing!');
         }
         return $accessToken;
     }
 
+    /**
+     * @throws InvalidTokenException
+     */
+    private function getRefreshToken(): string
+    {
+        $refreshToken = match ($this->refreshTokenSource) {
+            RefreshTokenSource::Body => $this->request->input('refresh_token'),
+            RefreshTokenSource::Cookie => $this->request->cookie('refresh_token'),
+        };
+
+        if (!$refreshToken) {
+            throw new InvalidTokenException('Token is missing!');
+        }
+        return $refreshToken;
+    }
+
     private function getUserFromToken(string $token): Authenticatable|JWTSubject|null
     {
         $parsedToken = $this->parser->parse($token);
         $parsedToken = TypeValidator::checkUnencryptedTokenType($parsedToken);
-        $userId = $this->parser->getClaim($parsedToken, 'sub');
+        $userId = $this->parser->getClaim($parsedToken, RegisteredClaims::SUBJECT);
 
         return $this->provider->retrieveById($userId);
     }
