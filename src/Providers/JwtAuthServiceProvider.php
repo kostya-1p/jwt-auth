@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Kostyap\JwtAuth\Enum\RefreshTokenStorage;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
@@ -29,12 +30,9 @@ class JwtAuthServiceProvider extends ServiceProvider
     public const CONFIG_FILE_NAME = 'jwt';
     public const CONFIG_FULL_NAME = self::CONFIG_FILE_NAME . '.php';
 
-    public array $bindings = [
-        RefreshSessionRepository::class => DatabaseRefreshSessionRepository::class
-    ];
-
     public function register(): void
     {
+        $this->bindRefreshSessionRepository();
         $this->registerPayloadGenerator();
         $this->registerJwtSigner();
         $this->registerJwtParser();
@@ -71,6 +69,17 @@ class JwtAuthServiceProvider extends ServiceProvider
                 Auth::createUserProvider($config['provider']),
                 $app->make(TokenRequestGetter::class),
             );
+        });
+    }
+
+    protected function bindRefreshSessionRepository(): void
+    {
+        $this->app->bind(RefreshSessionRepository::class, function (Application $app) {
+            /** @var RefreshTokenStorage $refreshTokenStorage */
+            $refreshTokenStorage = $this->config('token_source.refresh_token_storage');
+            return match ($refreshTokenStorage) {
+                RefreshTokenStorage::Database => new DatabaseRefreshSessionRepository(),
+            };
         });
     }
 
