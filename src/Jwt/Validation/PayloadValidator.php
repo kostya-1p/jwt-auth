@@ -55,7 +55,7 @@ class PayloadValidator
      */
     private function validateTokenTime(Validator $validator, UnencryptedToken $token): void
     {
-        //TODO: Is it right to pass psr/clock this way?
+        //TODO: Bind SystemClock in provider
         $validator->assert($token, new StrictValidAt(new SystemClock(
             new DateTimeZone(PayloadGenerator::CARBON_TIMEZONE)
         )));
