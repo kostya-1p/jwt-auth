@@ -15,11 +15,10 @@ class RefreshUtility
 {
     private const TOKEN_LENGTH = 16;
 
-    private int $refreshTtl;
-
-    public function __construct(private RefreshSessionRepository $refreshSessionRepository)
-    {
-        $this->refreshTtl = config('jwt.refresh_ttl', 20160);
+    public function __construct(
+        private RefreshSessionRepository $refreshSessionRepository,
+        private int $refreshTtl
+    ) {
     }
 
     /**
