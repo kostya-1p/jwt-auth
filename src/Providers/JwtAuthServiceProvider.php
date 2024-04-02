@@ -13,6 +13,7 @@ use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
 use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
 use Kostyap\JwtAuth\Jwt\Validation\PayloadValidator;
+use Kostyap\JwtAuth\Jwt\Validation\SignatureValidator;
 use Kostyap\JwtAuth\RefreshToken\Repository\DatabaseRefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshToken\Repository\RefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
@@ -37,6 +38,7 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->registerJwtSigner();
         $this->registerJwtParser();
         $this->registerPayloadValidator();
+        $this->registerSignatureValidator();
     }
 
     public function boot(): void
@@ -105,6 +107,16 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->app->bind(PayloadValidator::class, function (Application $app) {
             return new PayloadValidator(
                 $this->config('required_claims'),
+                new Validator(),
+            );
+        });
+    }
+
+    protected function registerSignatureValidator(): void
+    {
+        $this->app->bind(SignatureValidator::class, function (Application $app) {
+            return new SignatureValidator(
+                $app->make(JWTSigner::class),
                 new Validator(),
             );
         });

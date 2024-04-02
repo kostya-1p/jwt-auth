@@ -13,7 +13,8 @@ use Lcobucci\JWT\Validation\Validator;
 class SignatureValidator
 {
     public function __construct(
-        private JWTSigner $signer
+        private JWTSigner $signer,
+        private Validator $validator,
     ) {
     }
 
@@ -27,8 +28,6 @@ class SignatureValidator
         $algorithm = $this->signer->getJWTSigner();
         $verificationKey = $this->signer->getVerificationKey();
 
-        //TODO: don't create new validator instance here
-        $validator = new Validator();
-        $validator->assert($token, new SignedWith($algorithm, $verificationKey));
+        $this->validator->assert($token, new SignedWith($algorithm, $verificationKey));
     }
 }
