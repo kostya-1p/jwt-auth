@@ -8,24 +8,36 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
+use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
+use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
 use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
 use Kostyap\JwtAuth\RefreshToken\Repository\DatabaseRefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshToken\Repository\RefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
+use Lcobucci\JWT\Encoding\ChainedFormatter;
+use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Token\Builder;
 
 class JwtAuthServiceProvider extends ServiceProvider
 {
-    public const CONFIG_NAME = 'jwt.php';
+    public const CONFIG_FILE_NAME = 'jwt';
+    public const CONFIG_FULL_NAME = self::CONFIG_FILE_NAME . '.php';
 
     public array $bindings = [
         RefreshSessionRepository::class => DatabaseRefreshSessionRepository::class
     ];
 
+    public function register(): void
+    {
+        $this->registerPayloadGenerator();
+        $this->registerJwtSigner();
+    }
+
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../../config/config.php' => config_path(self::CONFIG_NAME)
+            __DIR__ . '/../../config/config.php' => config_path(self::CONFIG_FULL_NAME)
         ]);
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
@@ -51,5 +63,33 @@ class JwtAuthServiceProvider extends ServiceProvider
                 $app->make(TokenRequestGetter::class),
             );
         });
+    }
+
+    protected function registerPayloadGenerator(): void
+    {
+        $this->app->bind(PayloadGenerator::class, function (Application $app) {
+            return new PayloadGenerator(
+                $this->config('required_claims'),
+                $this->config('ttl'),
+                new Builder(new JoseEncoder(), ChainedFormatter::default())
+            );
+        });
+    }
+
+    protected function registerJwtSigner(): void
+    {
+        $this->app->bind(JWTSigner::class, function (Application $app) {
+            return new JWTSigner(
+                $this->config('algo'),
+                $this->config('secret'),
+                $this->config('keys.public'),
+                $this->config('keys.private'),
+            );
+        });
+    }
+
+    protected function config(string $key, $default = null): mixed
+    {
+        return config(self::CONFIG_FILE_NAME . '.' . $key, $default);
     }
 }

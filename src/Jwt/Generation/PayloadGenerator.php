@@ -6,9 +6,6 @@ use Carbon\Carbon;
 use DateTimeImmutable;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Jwt\JWTSubject;
-use Lcobucci\JWT\Encoding\ChainedFormatter;
-use Lcobucci\JWT\Encoding\JoseEncoder;
-use Lcobucci\JWT\Token\Builder;
 use Lcobucci\JWT\Builder as BuilderInterface;
 use Lcobucci\JWT\Token\RegisteredClaims;
 
@@ -16,13 +13,11 @@ class PayloadGenerator
 {
     public const CARBON_TIMEZONE = 'UTC';
 
-    private array $claims;
-    private int $ttl;
-
-    public function __construct()
-    {
-        $this->claims = config('jwt.required_claims');
-        $this->ttl = config('jwt.ttl');
+    public function __construct(
+        private array $claims,
+        private int $ttl,
+        private BuilderInterface $tokenBuilder
+    ) {
     }
 
     /**
@@ -30,24 +25,21 @@ class PayloadGenerator
      */
     public function getBuilderWithClaims(JWTSubject $subject): BuilderInterface
     {
-        //TODO: don't create new Builder here
-        $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
-
         foreach ($this->claims as $claim) {
-            $tokenBuilder = match ($claim) {
-                RegisteredClaims::ISSUED_AT => $tokenBuilder->issuedAt($this->iat()),
+            $this->tokenBuilder = match ($claim) {
+                RegisteredClaims::ISSUED_AT => $this->tokenBuilder->issuedAt($this->iat()),
 
-                RegisteredClaims::EXPIRATION_TIME => $tokenBuilder->expiresAt($this->exp()),
+                RegisteredClaims::EXPIRATION_TIME => $this->tokenBuilder->expiresAt($this->exp()),
 
-                RegisteredClaims::NOT_BEFORE => $tokenBuilder->canOnlyBeUsedAfter($this->nbf()),
+                RegisteredClaims::NOT_BEFORE => $this->tokenBuilder->canOnlyBeUsedAfter($this->nbf()),
 
-                RegisteredClaims::ID => $tokenBuilder->identifiedBy($this->jti()),
+                RegisteredClaims::ID => $this->tokenBuilder->identifiedBy($this->jti()),
 
-                RegisteredClaims::ISSUER => $tokenBuilder->issuedBy($this->iss()),
+                RegisteredClaims::ISSUER => $this->tokenBuilder->issuedBy($this->iss()),
 
-                RegisteredClaims::AUDIENCE => $tokenBuilder->permittedFor($this->aud()),
+                RegisteredClaims::AUDIENCE => $this->tokenBuilder->permittedFor($this->aud()),
 
-                RegisteredClaims::SUBJECT => $tokenBuilder->relatedTo($subject->getJWTIdentifier()),
+                RegisteredClaims::SUBJECT => $this->tokenBuilder->relatedTo($subject->getJWTIdentifier()),
 
                 default => throw new InvalidClaimsException('Unexpected JWT default claim'),
             };
@@ -56,10 +48,10 @@ class PayloadGenerator
         $customClaims = $subject->getJWTCustomClaims();
 
         foreach ($customClaims as $key => $value) {
-            $tokenBuilder = $tokenBuilder->withClaim($key, $value);
+            $this->tokenBuilder = $this->tokenBuilder->withClaim($key, $value);
         }
 
-        return $tokenBuilder;
+        return $this->tokenBuilder;
     }
 
     private function iss(): string

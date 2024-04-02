@@ -22,12 +22,7 @@ class JWTSigner
     public const ALGO_ES384 = 'ES384';
     public const ALGO_ES512 = 'ES512';
 
-    protected string $algo;
     protected Signer $JWTSigner;
-
-    protected ?string $secret;
-    protected ?string $publicKey;
-    protected ?string $privateKey;
 
     protected array $signers = [
         self::ALGO_HS256 => Signer\Hmac\Sha256::class,
@@ -41,12 +36,12 @@ class JWTSigner
         self::ALGO_ES512 => Signer\Ecdsa\Sha512::class,
     ];
 
-    public function __construct()
-    {
-        $this->algo = config('jwt.algo');
-        $this->secret = config('jwt.secret');
-        $this->publicKey = config('jwt.keys.public');
-        $this->privateKey = config('jwt.keys.private');
+    public function __construct(
+        protected string $algo,
+        protected ?string $secret,
+        protected ?string $publicKey,
+        protected ?string $privateKey,
+    ) {
     }
 
     public function getJWTSigner(): Signer
