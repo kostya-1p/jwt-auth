@@ -17,11 +17,8 @@ use Lcobucci\JWT\Validation\Validator;
 
 class PayloadValidator
 {
-    private array $requiredClaims;
-
-    public function __construct()
+    public function __construct(private array $requiredClaims, private Validator $validator)
     {
-        $this->requiredClaims = config('jwt.required_claims');
     }
 
     /**
@@ -30,11 +27,8 @@ class PayloadValidator
      */
     public function validatePayload(UnencryptedToken $token, JWTSubject $subject): void
     {
-        //TODO: don't create new validator instance here
-        $validator = new Validator();
-
-        $this->validateTokenTime($validator, $token);
-        $this->validateDefaultClaims($validator, $token, $subject);
+        $this->validateTokenTime($token);
+        $this->validateDefaultClaims($token, $subject);
         $this->validateCustomClaims($token, $subject);
     }
 
@@ -44,19 +38,17 @@ class PayloadValidator
      */
     public function validateExcludingTime(UnencryptedToken $token, JWTSubject $subject): void
     {
-        $validator = new Validator();
-
-        $this->validateDefaultClaims($validator, $token, $subject);
+        $this->validateDefaultClaims($token, $subject);
         $this->validateCustomClaims($token, $subject);
     }
 
     /**
      * @throws RequiredConstraintsViolated
      */
-    private function validateTokenTime(Validator $validator, UnencryptedToken $token): void
+    private function validateTokenTime(UnencryptedToken $token): void
     {
         //TODO: Bind SystemClock in provider
-        $validator->assert($token, new StrictValidAt(new SystemClock(
+        $this->validator->assert($token, new StrictValidAt(new SystemClock(
             new DateTimeZone(PayloadGenerator::CARBON_TIMEZONE)
         )));
     }
@@ -65,7 +57,7 @@ class PayloadValidator
      * @throws InvalidClaimsException
      * @throws RequiredConstraintsViolated
      */
-    private function validateDefaultClaims(Validator $validator, UnencryptedToken $token, JWTSubject $subject): void
+    private function validateDefaultClaims(UnencryptedToken $token, JWTSubject $subject): void
     {
         $tokenClaims = $token->claims();
 
@@ -76,8 +68,8 @@ class PayloadValidator
             }
 
             match ($claim) {
-                RegisteredClaims::AUDIENCE => $validator->assert($token, new PermittedFor($this->getCurrentHost())),
-                RegisteredClaims::SUBJECT => $validator->assert($token, new RelatedTo($subject->getJWTIdentifier())),
+                RegisteredClaims::AUDIENCE => $this->validator->assert($token, new PermittedFor($this->getCurrentHost())),
+                RegisteredClaims::SUBJECT => $this->validator->assert($token, new RelatedTo($subject->getJWTIdentifier())),
                 RegisteredClaims::ISSUER, RegisteredClaims::ISSUED_AT, RegisteredClaims::EXPIRATION_TIME,
                 RegisteredClaims::NOT_BEFORE, RegisteredClaims::ID => null,
                 default => throw new InvalidClaimsException('Unexpected JWT default claim'),

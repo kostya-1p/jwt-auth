@@ -12,12 +12,15 @@ use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
 use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
 use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
 use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
+use Kostyap\JwtAuth\Jwt\Validation\PayloadValidator;
 use Kostyap\JwtAuth\RefreshToken\Repository\DatabaseRefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshToken\Repository\RefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token\Builder;
+use Lcobucci\JWT\Token\Parser;
+use Lcobucci\JWT\Validation\Validator;
 
 class JwtAuthServiceProvider extends ServiceProvider
 {
@@ -32,6 +35,8 @@ class JwtAuthServiceProvider extends ServiceProvider
     {
         $this->registerPayloadGenerator();
         $this->registerJwtSigner();
+        $this->registerJwtParser();
+        $this->registerPayloadValidator();
     }
 
     public function boot(): void
@@ -84,6 +89,23 @@ class JwtAuthServiceProvider extends ServiceProvider
                 $this->config('secret'),
                 $this->config('keys.public'),
                 $this->config('keys.private'),
+            );
+        });
+    }
+
+    protected function registerJwtParser(): void
+    {
+        $this->app->bind(JWTParser::class, function (Application $app) {
+            return new JWTParser(new Parser(new JoseEncoder()));
+        });
+    }
+
+    protected function registerPayloadValidator(): void
+    {
+        $this->app->bind(PayloadValidator::class, function (Application $app) {
+            return new PayloadValidator(
+                $this->config('required_claims'),
+                new Validator(),
             );
         });
     }
