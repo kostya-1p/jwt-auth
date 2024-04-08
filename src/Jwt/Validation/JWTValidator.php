@@ -17,6 +17,7 @@ class JWTValidator
     public function __construct(
         private PayloadValidator $payloadValidator,
         private SignatureValidator $signatureValidator,
+        private Parser $parser,
     ) {
     }
 
@@ -29,10 +30,7 @@ class JWTValidator
      */
     public function validateToken(string $token, JWTSubject $subject): void
     {
-        //TODO: Don't create parser here
-        $parser = new Parser(new JoseEncoder());
-
-        $token = $parser->parse($token);
+        $token = $this->parser->parse($token);
 
         $token = TypeValidator::checkUnencryptedTokenType($token);
         $this->payloadValidator->validatePayload($token, $subject);
@@ -48,9 +46,7 @@ class JWTValidator
      */
     public function validateExcludingTime(string $token, JWTSubject $subject): void
     {
-        $parser = new Parser(new JoseEncoder());
-
-        $token = $parser->parse($token);
+        $token = $this->parser->parse($token);
 
         $token = TypeValidator::checkUnencryptedTokenType($token);
         $this->payloadValidator->validateExcludingTime($token, $subject);

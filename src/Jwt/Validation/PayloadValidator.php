@@ -47,7 +47,6 @@ class PayloadValidator
      */
     private function validateTokenTime(UnencryptedToken $token): void
     {
-        //TODO: Bind SystemClock in provider
         $this->validator->assert($token, new StrictValidAt(new SystemClock(
             new DateTimeZone(PayloadGenerator::CARBON_TIMEZONE)
         )));

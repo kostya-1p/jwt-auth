@@ -42,6 +42,7 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->registerRefreshUtility();
         $this->registerTokenRequestGetter();
         $this->registerTokenResponseSetter();
+        $this->registerJwtValidator();
     }
 
     public function boot(): void
@@ -164,6 +165,17 @@ class JwtAuthServiceProvider extends ServiceProvider
                 $this->config('token_source.access_token'),
                 $this->config('token_source.refresh_token'),
                 $this->config('refresh_ttl'),
+            );
+        });
+    }
+
+    protected function registerJwtValidator(): void
+    {
+        $this->app->bind(JWTValidator::class, function (Application $app) {
+            return new JWTValidator(
+                $app->make(PayloadValidator::class),
+                $app->make(SignatureValidator::class),
+                new Parser(new JoseEncoder()),
             );
         });
     }
