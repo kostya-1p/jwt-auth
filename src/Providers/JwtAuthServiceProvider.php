@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Kostyap\JwtAuth\Enum\RefreshTokenStorage;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
+use Kostyap\JwtAuth\Helpers\TokenResponseSetter;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
 use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
 use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
@@ -39,6 +40,8 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->registerPayloadValidator();
         $this->registerSignatureValidator();
         $this->registerRefreshUtility();
+        $this->registerTokenRequestGetter();
+        $this->registerTokenResponseSetter();
     }
 
     public function boot(): void
@@ -139,6 +142,28 @@ class JwtAuthServiceProvider extends ServiceProvider
             return new RefreshUtility(
                 $app->make(RefreshSessionRepository::class),
                 $this->config('refresh_ttl', 20160),
+            );
+        });
+    }
+
+    protected function registerTokenRequestGetter(): void
+    {
+        $this->app->bind(TokenRequestGetter::class, function (Application $app) {
+            return new TokenRequestGetter(
+                $app->make(Request::class),
+                $this->config('token_source.access_token'),
+                $this->config('token_source.refresh_token'),
+            );
+        });
+    }
+
+    protected function registerTokenResponseSetter(): void
+    {
+        $this->app->bind(TokenResponseSetter::class, function (Application $app) {
+            return new TokenResponseSetter(
+                $this->config('token_source.access_token'),
+                $this->config('token_source.refresh_token'),
+                $this->config('refresh_ttl'),
             );
         });
     }

@@ -12,13 +12,11 @@ class TokenRequestGetter
     public const ACCESS_TOKEN_KEY = 'access_token';
     public const REFRESH_TOKEN_KEY = 'refresh_token';
 
-    private AccessTokenSource $accessTokenSource;
-    private RefreshTokenSource $refreshTokenSource;
-
-    public function __construct(private Request $request)
-    {
-        $this->accessTokenSource = config('jwt.token_source.access_token');
-        $this->refreshTokenSource = config('jwt.token_source.refresh_token');
+    public function __construct(
+        private Request $request,
+        private AccessTokenSource $accessTokenSource,
+        private RefreshTokenSource $refreshTokenSource,
+    ) {
     }
 
     /**
