@@ -24,6 +24,7 @@ class JWTSigner
 
     protected Signer $JWTSigner;
 
+    /** @var array<string, string> */
     protected array $signers = [
         self::ALGO_HS256 => Signer\Hmac\Sha256::class,
         self::ALGO_HS384 => Signer\Hmac\Sha384::class,

@@ -73,6 +73,7 @@ class JWTGuard implements Guard
 
     /**
      * @inheritDoc
+     * @param array<string, string> $credentials
      */
     public function validate(array $credentials = []): bool
     {
@@ -86,6 +87,8 @@ class JWTGuard implements Guard
      * @throws InvalidRefreshSession
      * @throws InvalidClaimsException
      * @throws RequestInputException
+     *
+     * @param array<string, string> $credentials
      */
     public function attempt(array $credentials = [], bool $login = true): bool|TokenPair
     {
@@ -115,6 +118,7 @@ class JWTGuard implements Guard
         return TokenPair::make($accessToken, $refreshToken);
     }
 
+    /** @param array<string, string> $credentials */
     protected function hasValidCredentials(?Authenticatable $user, array $credentials): bool
     {
         return $user !== null && $this->provider->validateCredentials($user, $credentials);

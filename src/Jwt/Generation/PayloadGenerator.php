@@ -13,6 +13,7 @@ class PayloadGenerator
 {
     public const CARBON_TIMEZONE = 'UTC';
 
+    /** @param string[] $claims */
     public function __construct(
         private array $claims,
         private int $ttl,

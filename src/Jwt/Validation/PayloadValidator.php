@@ -17,6 +17,7 @@ use Lcobucci\JWT\Validation\Validator;
 
 class PayloadValidator
 {
+    /** @param string[] $requiredClaims */
     public function __construct(private array $requiredClaims, private Validator $validator)
     {
     }

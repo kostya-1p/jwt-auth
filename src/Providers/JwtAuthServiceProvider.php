@@ -180,7 +180,7 @@ class JwtAuthServiceProvider extends ServiceProvider
         });
     }
 
-    protected function config(string $key, $default = null): mixed
+    protected function config(string $key, mixed $default = null): mixed
     {
         return config(self::CONFIG_FILE_NAME . '.' . $key, $default);
     }

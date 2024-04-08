@@ -2,9 +2,11 @@ includes:
 	- phpstan-baseline.neon
 
 parameters:
-	level: 5
+	level: 6
 	paths:
 		- ../src
 	ignoreErrors:
 	    - '#^Function config not found\.$#'
 	    - '#^Function config_path not found\.$#'
+	    - '#^Function base_path not found\.$#'
+	    - '#^Function app_path not found\.$#'

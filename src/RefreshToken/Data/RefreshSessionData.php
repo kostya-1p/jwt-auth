@@ -47,6 +47,7 @@ class RefreshSessionData
         return $dto;
     }
 
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
         return [
