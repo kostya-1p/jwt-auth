@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Kostyap\JwtAuth\Enum\RefreshTokenStorage;
+use Kostyap\JwtAuth\Exceptions\InvalidRepositoryImplementation;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Helpers\TokenResponseSetter;
 use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
@@ -83,6 +84,9 @@ class JwtAuthServiceProvider extends ServiceProvider
             $refreshTokenStorage = $this->config('token_source.refresh_token_storage');
             return match ($refreshTokenStorage) {
                 RefreshTokenStorage::Database => new DatabaseRefreshSessionRepository(),
+                RefreshTokenStorage::Redis => throw new InvalidRepositoryImplementation(
+                    'The Redis implementation is not yet complete'
+                ),
             };
         });
     }
