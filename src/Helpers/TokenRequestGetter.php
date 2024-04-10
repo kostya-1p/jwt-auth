@@ -21,6 +21,7 @@ class TokenRequestGetter
 
     /**
      * @throws InvalidTokenException
+     * @return non-empty-string
      */
     public function getAccessToken(): string
     {
@@ -37,6 +38,7 @@ class TokenRequestGetter
 
     /**
      * @throws InvalidTokenException
+     * @return non-empty-string
      */
     public function getRefreshToken(): string
     {

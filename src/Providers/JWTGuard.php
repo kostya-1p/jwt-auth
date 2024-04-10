@@ -174,6 +174,7 @@ class JWTGuard implements Guard
         return TokenPair::make($accessToken, $refreshToken);
     }
 
+    /** @param non-empty-string $token */
     private function getUserFromToken(string $token): Authenticatable|JWTSubject|null
     {
         $parsedToken = $this->parser->parse($token);
