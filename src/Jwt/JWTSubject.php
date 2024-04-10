@@ -6,6 +6,6 @@ interface JWTSubject
 {
     public function getJWTIdentifier(): mixed;
 
-    /** @return array<int|string, mixed> */
+    /** @return array<non-empty-string, mixed> */
     public function getJWTCustomClaims(): array;
 }

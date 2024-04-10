@@ -12,6 +12,7 @@ use Lcobucci\JWT\Token\RegisteredClaims;
 class PayloadGenerator
 {
     public const CARBON_TIMEZONE = 'UTC';
+    private const JTI_LENGTH = 16;
 
     /** @param string[] $claims */
     public function __construct(
@@ -55,6 +56,7 @@ class PayloadGenerator
         return $this->tokenBuilder;
     }
 
+    /** @return non-empty-string */
     private function iss(): string
     {
         return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -75,11 +77,13 @@ class PayloadGenerator
         return Carbon::now(self::CARBON_TIMEZONE)->toDateTimeImmutable();
     }
 
+    /** @return non-empty-string */
     private function jti(): string
     {
-        return base64_encode(random_bytes(16));
+        return base64_encode(random_bytes(self::JTI_LENGTH));
     }
 
+    /** @return non-empty-string */
     private function aud(): string
     {
         return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]";
