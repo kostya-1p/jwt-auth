@@ -52,6 +52,10 @@ class JWTSigner
         }
 
         $signer = $this->signers[$this->algo];
+
+        if (!is_a($signer, Signer::class, true)) {
+            throw new SignatureAlgorithmException($signer . ' does not implement Signer interface');
+        }
         $this->JWTSigner = new $signer();
         return $this->JWTSigner;
     }
