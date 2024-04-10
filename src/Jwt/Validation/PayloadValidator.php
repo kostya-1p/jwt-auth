@@ -61,7 +61,6 @@ class PayloadValidator
     {
         $tokenClaims = $token->claims();
 
-        /** @var string $claim */
         foreach ($this->requiredClaims as $claim) {
             if (!$tokenClaims->has($claim)) {
                 throw new InvalidClaimsException('Token payload does not contain required claim: ' . $claim);
@@ -92,6 +91,7 @@ class PayloadValidator
         }
     }
 
+    /** @return non-empty-string */
     private function getCurrentHost(): string
     {
         return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]";

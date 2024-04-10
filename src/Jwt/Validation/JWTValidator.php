@@ -27,6 +27,7 @@ class JWTValidator
      * @throws TokenTypeException
      * @throws SignatureAlgorithmException
      * @throws SignatureKeyException
+     * @param non-empty-string $token
      */
     public function validateToken(string $token, JWTSubject $subject): void
     {
@@ -43,6 +44,7 @@ class JWTValidator
      * @throws SignatureKeyException
      * @throws InvalidClaimsException
      * @throws RequiredConstraintsViolated
+     * @param non-empty-string $token
      */
     public function validateExcludingTime(string $token, JWTSubject $subject): void
     {
