@@ -100,6 +100,7 @@ class JWTSigner
             || is_subclass_of($this->JWTSigner, Ecdsa::class);
     }
 
+    /** @param non-empty-string $contents */
     protected function getKey(string $contents, string $passphrase = ''): Key
     {
         return InMemory::plainText($contents, $passphrase);
