@@ -58,9 +58,6 @@ class JWTGuard implements Guard
         try {
             $token = $this->tokenRequestGetter->getAccessToken();
             $user = $this->getUserFromToken($token);
-            if (is_null($user)) {
-                throw new InvalidTokenException('Could not get user from token');
-            }
 
             $this->validator->validateToken($token, $user);
             $this->user = $user;
@@ -81,22 +78,28 @@ class JWTGuard implements Guard
     }
 
     /**
-     * @throws SignatureAlgorithmException
+     * @param array<string, string> $credentials
      * @throws RandomException
      * @throws SignatureKeyException
      * @throws InvalidRefreshSession
      * @throws InvalidClaimsException
      * @throws RequestInputException
-     *
-     * @param array<string, string> $credentials
+     * @throws SignatureAlgorithmException
+     * @throws InvalidTokenException
      */
     public function attempt(array $credentials = [], bool $login = true): bool|TokenPair
     {
-        /** @var Authenticatable|JWTSubject|null $user */
         $user = $this->provider->retrieveByCredentials($credentials);
 
         if ($this->hasValidCredentials($user, $credentials)) {
-            return $login ? $this->login($user) : true;
+            if (!$login) {
+                return true;
+            }
+
+            if (!($user instanceof JWTSubject)) {
+                throw new InvalidTokenException('Token subject does not implement JWTSubject interface!');
+            }
+            return $this->login($user);
         }
 
         return false;
@@ -141,9 +144,6 @@ class JWTGuard implements Guard
         $refreshMetaData = $this->getRefreshMetaData();
 
         $user = $this->getUserFromToken($tokenPair->accessToken);
-        if (is_null($user)) {
-            throw new InvalidTokenException('Could not get user from token');
-        }
 
         return $this->refresher->refresh($tokenPair, $refreshMetaData, $user);
     }
@@ -174,13 +174,27 @@ class JWTGuard implements Guard
         return TokenPair::make($accessToken, $refreshToken);
     }
 
-    /** @param non-empty-string $token */
-    private function getUserFromToken(string $token): Authenticatable|JWTSubject|null
+    /**
+     * @param non-empty-string $token
+     * @throws InvalidTokenException
+     * @throws TokenTypeException
+     */
+    private function getUserFromToken(string $token): Authenticatable & JWTSubject
     {
         $parsedToken = $this->parser->parse($token);
         $parsedToken = TypeValidator::checkUnencryptedTokenType($parsedToken);
         $userId = $this->parser->getClaim($parsedToken, RegisteredClaims::SUBJECT);
+        $user = $this->provider->retrieveById($userId);
 
-        return $this->provider->retrieveById($userId);
+        if (is_null($user)) {
+            throw new InvalidTokenException('Could not get user from token');
+        }
+
+        if (!($user instanceof JWTSubject)) {
+            throw new InvalidTokenException('Token subject does not implement JWTSubject interface!');
+        }
+
+        /** @var Authenticatable & JWTSubject */
+        return $user;
     }
 }
