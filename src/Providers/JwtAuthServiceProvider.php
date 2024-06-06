@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Kostyap\JwtAuth\Commands\CopyDefaultController;
 use Kostyap\JwtAuth\Enums\RefreshTokenStorage;
 use Kostyap\JwtAuth\Exceptions\InvalidRepositoryImplementation;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;

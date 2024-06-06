@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\Providers;
+namespace Kostyap\JwtAuth\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
