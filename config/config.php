@@ -1,9 +1,9 @@
 <?php
 
-use Kostyap\JwtAuth\Enum\AccessTokenSource;
-use Kostyap\JwtAuth\Enum\RefreshTokenSource;
-use Kostyap\JwtAuth\Enum\RefreshTokenStorage;
-use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
+use Kostyap\JwtAuth\Enums\AccessTokenSource;
+use Kostyap\JwtAuth\Enums\RefreshTokenSource;
+use Kostyap\JwtAuth\Enums\RefreshTokenStorage;
+use Kostyap\JwtAuth\JwtServices\Generators\JWTSigner;
 
 return [
     'secret' => env('JWT_SECRET'),

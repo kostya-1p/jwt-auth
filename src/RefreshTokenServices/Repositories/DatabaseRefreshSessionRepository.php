@@ -1,13 +1,13 @@
 <?php
 
-namespace Kostyap\JwtAuth\RefreshToken\Repository;
+namespace Kostyap\JwtAuth\RefreshTokenServices\Repositories;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
-use Kostyap\JwtAuth\RefreshToken\Data\RefreshSessionData;
+use Kostyap\JwtAuth\JwtServices\Generators\PayloadGenerator;
+use Kostyap\JwtAuth\RefreshTokenServices\Data\RefreshSessionData;
 
-class DatabaseRefreshSessionRepository implements RefreshSessionRepository
+class DatabaseRefreshSessionRepository implements RefreshSessionRepositoryInterface
 {
     private const TABLE_NAME = 'refresh_sessions';
 

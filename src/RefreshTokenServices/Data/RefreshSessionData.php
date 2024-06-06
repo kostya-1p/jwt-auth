@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\RefreshToken\Data;
+namespace Kostyap\JwtAuth\RefreshTokenServices\Data;
 
 use Carbon\Carbon;
 

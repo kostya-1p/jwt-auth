@@ -1,11 +1,11 @@
 <?php
 
-namespace Kostyap\JwtAuth\Jwt\Validation;
+namespace Kostyap\JwtAuth\JwtServices\Validators;
 
 use DateTimeZone;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
-use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
-use Kostyap\JwtAuth\Jwt\JWTSubject;
+use Kostyap\JwtAuth\JwtServices\Generators\PayloadGenerator;
+use Kostyap\JwtAuth\JwtServices\JWTSubject;
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Token\RegisteredClaims;
 use Lcobucci\JWT\UnencryptedToken;

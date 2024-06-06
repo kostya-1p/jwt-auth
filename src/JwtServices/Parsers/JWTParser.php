@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\Jwt\Parsing;
+namespace Kostyap\JwtAuth\JwtServices\Parsers;
 
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token;

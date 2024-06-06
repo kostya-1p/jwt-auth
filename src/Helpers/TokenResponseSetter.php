@@ -4,9 +4,9 @@ namespace Kostyap\JwtAuth\Helpers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Response;
-use Kostyap\JwtAuth\Enum\AccessTokenSource;
-use Kostyap\JwtAuth\Enum\RefreshTokenSource;
-use Kostyap\JwtAuth\Jwt\Data\TokenPair;
+use Kostyap\JwtAuth\Enums\AccessTokenSource;
+use Kostyap\JwtAuth\Enums\RefreshTokenSource;
+use Kostyap\JwtAuth\JwtServices\Data\TokenPair;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class TokenResponseSetter

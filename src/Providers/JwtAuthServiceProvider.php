@@ -6,21 +6,21 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
-use Kostyap\JwtAuth\Enum\RefreshTokenStorage;
+use Kostyap\JwtAuth\Enums\RefreshTokenStorage;
 use Kostyap\JwtAuth\Exceptions\InvalidRepositoryImplementation;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Helpers\TokenResponseSetter;
-use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
-use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
-use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
-use Kostyap\JwtAuth\Jwt\Parsing\JWTParser;
-use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
-use Kostyap\JwtAuth\Jwt\Validation\PayloadValidator;
-use Kostyap\JwtAuth\Jwt\Validation\SignatureValidator;
-use Kostyap\JwtAuth\RefreshToken\RefreshUtility;
-use Kostyap\JwtAuth\RefreshToken\Repository\DatabaseRefreshSessionRepository;
-use Kostyap\JwtAuth\RefreshToken\Repository\RefreshSessionRepository;
-use Kostyap\JwtAuth\RefreshToken\TokenRefresher;
+use Kostyap\JwtAuth\JwtServices\Generators\JWTGenerator;
+use Kostyap\JwtAuth\JwtServices\Generators\JWTSigner;
+use Kostyap\JwtAuth\JwtServices\Generators\PayloadGenerator;
+use Kostyap\JwtAuth\JwtServices\Parsers\JWTParser;
+use Kostyap\JwtAuth\JwtServices\Validators\JWTValidator;
+use Kostyap\JwtAuth\JwtServices\Validators\PayloadValidator;
+use Kostyap\JwtAuth\JwtServices\Validators\SignatureValidator;
+use Kostyap\JwtAuth\RefreshTokenServices\RefreshUtility;
+use Kostyap\JwtAuth\RefreshTokenServices\Repositories\DatabaseRefreshSessionRepository;
+use Kostyap\JwtAuth\RefreshTokenServices\Repositories\RefreshSessionRepositoryInterface;
+use Kostyap\JwtAuth\RefreshTokenServices\TokenRefresher;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token\Builder;
@@ -79,7 +79,7 @@ class JwtAuthServiceProvider extends ServiceProvider
 
     protected function bindRefreshSessionRepository(): void
     {
-        $this->app->bind(RefreshSessionRepository::class, function (Application $app) {
+        $this->app->bind(RefreshSessionRepositoryInterface::class, function (Application $app) {
             /** @var RefreshTokenStorage $refreshTokenStorage */
             $refreshTokenStorage = $this->config('token_source.refresh_token_storage');
             return match ($refreshTokenStorage) {
@@ -145,7 +145,7 @@ class JwtAuthServiceProvider extends ServiceProvider
     {
         $this->app->bind(RefreshUtility::class, function (Application $app) {
             return new RefreshUtility(
-                $app->make(RefreshSessionRepository::class),
+                $app->make(RefreshSessionRepositoryInterface::class),
                 $this->config('refresh_ttl', 20160),
             );
         });

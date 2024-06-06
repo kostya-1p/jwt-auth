@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\Enum;
+namespace Kostyap\JwtAuth\Enums;
 
 enum RefreshTokenSource: string
 {

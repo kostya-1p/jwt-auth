@@ -1,11 +1,11 @@
 <?php
 
-namespace Kostyap\JwtAuth\Jwt\Generation;
+namespace Kostyap\JwtAuth\JwtServices\Generators;
 
 use Carbon\Carbon;
 use DateTimeImmutable;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
-use Kostyap\JwtAuth\Jwt\JWTSubject;
+use Kostyap\JwtAuth\JwtServices\JWTSubject;
 use Lcobucci\JWT\Builder as BuilderInterface;
 use Lcobucci\JWT\Token\RegisteredClaims;
 

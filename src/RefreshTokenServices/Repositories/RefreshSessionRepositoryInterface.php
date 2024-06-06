@@ -1,10 +1,10 @@
 <?php
 
-namespace Kostyap\JwtAuth\RefreshToken\Repository;
+namespace Kostyap\JwtAuth\RefreshTokenServices\Repositories;
 
-use Kostyap\JwtAuth\RefreshToken\Data\RefreshSessionData;
+use Kostyap\JwtAuth\RefreshTokenServices\Data\RefreshSessionData;
 
-interface RefreshSessionRepository
+interface RefreshSessionRepositoryInterface
 {
     public function getByRefreshToken(string $refreshToken): ?RefreshSessionData;
 

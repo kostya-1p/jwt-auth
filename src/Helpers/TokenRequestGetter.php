@@ -3,8 +3,8 @@
 namespace Kostyap\JwtAuth\Helpers;
 
 use Illuminate\Http\Request;
-use Kostyap\JwtAuth\Enum\AccessTokenSource;
-use Kostyap\JwtAuth\Enum\RefreshTokenSource;
+use Kostyap\JwtAuth\Enums\AccessTokenSource;
+use Kostyap\JwtAuth\Enums\RefreshTokenSource;
 use Kostyap\JwtAuth\Exceptions\InvalidTokenException;
 
 class TokenRequestGetter

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\Jwt\Generation;
+namespace Kostyap\JwtAuth\JwtServices\Generators;
 
 use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;

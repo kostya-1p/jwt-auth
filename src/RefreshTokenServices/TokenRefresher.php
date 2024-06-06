@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\RefreshToken;
+namespace Kostyap\JwtAuth\RefreshTokenServices;
 
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
@@ -8,11 +8,11 @@ use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Kostyap\JwtAuth\Exceptions\TokenExpiredException;
 use Kostyap\JwtAuth\Exceptions\TokenTypeException;
-use Kostyap\JwtAuth\Jwt\Data\TokenPair;
-use Kostyap\JwtAuth\Jwt\Generation\JWTGenerator;
-use Kostyap\JwtAuth\Jwt\JWTSubject;
-use Kostyap\JwtAuth\Jwt\Validation\JWTValidator;
-use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
+use Kostyap\JwtAuth\JwtServices\Data\TokenPair;
+use Kostyap\JwtAuth\JwtServices\Generators\JWTGenerator;
+use Kostyap\JwtAuth\JwtServices\JWTSubject;
+use Kostyap\JwtAuth\JwtServices\Validators\JWTValidator;
+use Kostyap\JwtAuth\RefreshTokenServices\Data\RefreshMetaData;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
 use Random\RandomException;
 

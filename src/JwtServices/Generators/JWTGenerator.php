@@ -1,11 +1,11 @@
 <?php
 
-namespace Kostyap\JwtAuth\Jwt\Generation;
+namespace Kostyap\JwtAuth\JwtServices\Generators;
 
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
-use Kostyap\JwtAuth\Jwt\JWTSubject;
+use Kostyap\JwtAuth\JwtServices\JWTSubject;
 
 class JWTGenerator
 {

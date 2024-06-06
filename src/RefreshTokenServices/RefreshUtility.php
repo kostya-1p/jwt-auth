@@ -1,14 +1,14 @@
 <?php
 
-namespace Kostyap\JwtAuth\RefreshToken;
+namespace Kostyap\JwtAuth\RefreshTokenServices;
 
 use Carbon\Carbon;
 use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
 use Kostyap\JwtAuth\Exceptions\TokenExpiredException;
-use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
-use Kostyap\JwtAuth\RefreshToken\Data\RefreshMetaData;
-use Kostyap\JwtAuth\RefreshToken\Data\RefreshSessionData;
-use Kostyap\JwtAuth\RefreshToken\Repository\RefreshSessionRepository;
+use Kostyap\JwtAuth\JwtServices\Generators\PayloadGenerator;
+use Kostyap\JwtAuth\RefreshTokenServices\Data\RefreshMetaData;
+use Kostyap\JwtAuth\RefreshTokenServices\Data\RefreshSessionData;
+use Kostyap\JwtAuth\RefreshTokenServices\Repositories\RefreshSessionRepositoryInterface;
 use Random\RandomException;
 
 class RefreshUtility
@@ -16,7 +16,7 @@ class RefreshUtility
     private const TOKEN_LENGTH = 16;
 
     public function __construct(
-        private RefreshSessionRepository $refreshSessionRepository,
+        private RefreshSessionRepositoryInterface $refreshSessionRepository,
         private int $refreshTtl
     ) {
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\Jwt\Data;
+namespace Kostyap\JwtAuth\JwtServices\Data;
 
 class TokenPair
 {

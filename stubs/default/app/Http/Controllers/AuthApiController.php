@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Kostyap\JwtAuth\Helpers\TokenResponseSetter;
-use Kostyap\JwtAuth\Jwt\Data\TokenPair;
+use Kostyap\JwtAuth\JwtServices\Data\TokenPair;
 
 class AuthApiController extends Controller
 {

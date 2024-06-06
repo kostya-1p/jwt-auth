@@ -4,7 +4,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Kostyap\JwtAuth\Jwt\Generation\PayloadGenerator;
+use Kostyap\JwtAuth\JwtServices\Generators\PayloadGenerator;
 
 return new class extends Migration {
     public function up(): void

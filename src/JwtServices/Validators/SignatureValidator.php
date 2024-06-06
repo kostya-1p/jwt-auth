@@ -1,10 +1,10 @@
 <?php
 
-namespace Kostyap\JwtAuth\Jwt\Validation;
+namespace Kostyap\JwtAuth\JwtServices\Validators;
 
 use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
-use Kostyap\JwtAuth\Jwt\Generation\JWTSigner;
+use Kostyap\JwtAuth\JwtServices\Generators\JWTSigner;
 use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
