@@ -160,7 +160,7 @@ class JWTGuard implements Guard
         if (!$fingerPrint) {
             throw new RequestInputException('Fingerprint is required!');
         }
-        return RefreshMetaData::make($userAgent, $fingerPrint, $ip);
+        return new RefreshMetaData($userAgent, $fingerPrint, $ip);
     }
 
     /**

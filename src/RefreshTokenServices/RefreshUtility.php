@@ -56,7 +56,7 @@ class RefreshUtility
         $tokenCreatedAt = Carbon::now(PayloadGenerator::CARBON_TIMEZONE);
         $tokenExpiresIn = (clone $tokenCreatedAt)->addMinutes($this->refreshTtl);
 
-        $refreshSession = RefreshSessionData::make(
+        $refreshSession = new RefreshSessionData(
             null,
             $refreshToken,
             $refreshMetaData->userAgent,
