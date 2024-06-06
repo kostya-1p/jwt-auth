@@ -4,17 +4,11 @@ namespace Kostyap\JwtAuth\JwtServices\Data;
 
 class TokenPair
 {
-    /** @var non-empty-string */
-    public string $accessToken;
-
-    /** @var non-empty-string */
-    public string $refreshToken;
-
-    public static function make(string $accessToken, string $refreshToken): TokenPair
+    /**
+     * @param non-empty-string $accessToken
+     * @param non-empty-string $refreshToken
+     */
+    public function __construct(public string $accessToken, public string $refreshToken)
     {
-        $dto = new self();
-        $dto->accessToken = $accessToken;
-        $dto->refreshToken = $refreshToken;
-        return $dto;
     }
 }

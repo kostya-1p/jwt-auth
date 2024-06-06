@@ -46,7 +46,7 @@ class TokenRefresher
         $newAccessToken = $this->jwtGenerator->fromSubject($subject);
         $newRefreshToken = $newRefreshSession->refreshToken;
 
-        return TokenPair::make($newAccessToken, $newRefreshToken);
+        return new TokenPair($newAccessToken, $newRefreshToken);
     }
 
     /**

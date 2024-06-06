@@ -118,7 +118,7 @@ class JWTGuard implements Guard
         $accessToken = $this->jwtGenerator->fromSubject($user);
         $refreshMetaData = $this->getRefreshMetaData();
         $refreshToken = $this->refresher->generateToken($refreshMetaData);
-        return TokenPair::make($accessToken, $refreshToken);
+        return new TokenPair($accessToken, $refreshToken);
     }
 
     /** @param array<string, string> $credentials */
@@ -171,7 +171,7 @@ class JWTGuard implements Guard
         $accessToken = $this->tokenRequestGetter->getAccessToken();
         $refreshToken = $this->tokenRequestGetter->getRefreshToken();
 
-        return TokenPair::make($accessToken, $refreshToken);
+        return new TokenPair($accessToken, $refreshToken);
     }
 
     /**
