@@ -16,12 +16,14 @@ class RequestUrlHelper
         }
     }
 
+    /** @return non-empty-string */
     public static function getCurrentHost(): string
     {
         self::checkServerValueExistence(self::HOST_KEY);
         return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . '://' . $_SERVER[self::HOST_KEY];
     }
 
+    /** @return non-empty-string */
     public static function getCurrentUrl(): string
     {
         self::checkServerValueExistence(self::URI_KEY);

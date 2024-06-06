@@ -5,6 +5,7 @@ namespace Kostyap\JwtAuth\JwtServices\Generators;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
+use Kostyap\JwtAuth\Helpers\RequestUrlHelper;
 use Kostyap\JwtAuth\JwtServices\JWTSubject;
 use Lcobucci\JWT\Builder as BuilderInterface;
 use Lcobucci\JWT\Token\RegisteredClaims;
@@ -59,7 +60,7 @@ class PayloadGenerator
     /** @return non-empty-string */
     private function iss(): string
     {
-        return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        return RequestUrlHelper::getCurrentUrl();
     }
 
     private function iat(): DateTimeImmutable
@@ -86,6 +87,6 @@ class PayloadGenerator
     /** @return non-empty-string */
     private function aud(): string
     {
-        return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]";
+        return RequestUrlHelper::getCurrentHost();
     }
 }

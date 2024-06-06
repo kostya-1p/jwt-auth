@@ -4,6 +4,7 @@ namespace Kostyap\JwtAuth\JwtServices\Validators;
 
 use DateTimeZone;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
+use Kostyap\JwtAuth\Helpers\RequestUrlHelper;
 use Kostyap\JwtAuth\JwtServices\Generators\PayloadGenerator;
 use Kostyap\JwtAuth\JwtServices\JWTSubject;
 use Lcobucci\Clock\SystemClock;
@@ -67,8 +68,12 @@ class PayloadValidator
             }
 
             match ($claim) {
-                RegisteredClaims::AUDIENCE => $this->validator->assert($token, new PermittedFor($this->getCurrentHost())),
-                RegisteredClaims::SUBJECT => $this->validator->assert($token, new RelatedTo($subject->getJWTIdentifier())),
+                RegisteredClaims::AUDIENCE => $this->validator->assert(
+                    $token, new PermittedFor(RequestUrlHelper::getCurrentHost()
+                )),
+                RegisteredClaims::SUBJECT => $this->validator->assert(
+                    $token, new RelatedTo($subject->getJWTIdentifier()
+                )),
                 RegisteredClaims::ISSUER, RegisteredClaims::ISSUED_AT, RegisteredClaims::EXPIRATION_TIME,
                 RegisteredClaims::NOT_BEFORE, RegisteredClaims::ID => null,
                 default => throw new InvalidClaimsException('Unexpected JWT default claim'),
@@ -89,11 +94,5 @@ class PayloadValidator
                 throw new InvalidClaimsException('Token payload does not contain custom claim ' . $claim . ' with key ' . $key);
             }
         }
-    }
-
-    /** @return non-empty-string */
-    private function getCurrentHost(): string
-    {
-        return (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]";
     }
 }
