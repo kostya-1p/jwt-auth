@@ -55,7 +55,6 @@ class TokenRefresher
      */
     public function generateToken(RefreshMetaData $refreshMetaData): string
     {
-        $refreshSession = $this->refreshUtility->generateToken($refreshMetaData);
-        return $refreshSession->refreshToken;
+        return $this->refreshUtility->generateToken($refreshMetaData)->refreshToken;
     }
 }
