@@ -4,7 +4,7 @@ includes:
 parameters:
 	level: 7
 	paths:
-		- ../src
+		- ./src
 	ignoreErrors:
 	    - '#^Function config not found\.$#'
 	    - '#^Function config_path not found\.$#'
