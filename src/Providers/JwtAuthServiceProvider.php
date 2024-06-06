@@ -10,6 +10,7 @@ use Kostyap\JwtAuth\Enums\RefreshTokenStorage;
 use Kostyap\JwtAuth\Exceptions\InvalidRepositoryImplementation;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Helpers\TokenResponseSetter;
+use Kostyap\JwtAuth\JWTGuard;
 use Kostyap\JwtAuth\JwtServices\Generators\JWTGenerator;
 use Kostyap\JwtAuth\JwtServices\Generators\JWTSigner;
 use Kostyap\JwtAuth\JwtServices\Generators\PayloadGenerator;

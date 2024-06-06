@@ -1,6 +1,6 @@
 <?php
 
-namespace Kostyap\JwtAuth\Providers;
+namespace Kostyap\JwtAuth;
 
 use Exception;
 use Illuminate\Auth\GuardHelpers;
@@ -8,8 +8,6 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
-use Kostyap\JwtAuth\Enums\AccessTokenSource;
-use Kostyap\JwtAuth\Enums\RefreshTokenSource;
 use Kostyap\JwtAuth\Exceptions\InvalidClaimsException;
 use Kostyap\JwtAuth\Exceptions\InvalidRefreshSession;
 use Kostyap\JwtAuth\Exceptions\InvalidTokenException;
