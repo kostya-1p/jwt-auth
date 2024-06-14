@@ -53,14 +53,14 @@ class JwtAuthServiceProvider extends ServiceProvider
 
         $this->app->when(HttpHandler::class)
             ->needs(TokenSourceInterface::class)
-            ->needs('accessTokenSource')
+            ->needs('$accessTokenSource')
             ->give(function (Application $app) {
                 return new BearerAccessTokenSource($app->make(Request::class));
             });
 
         $this->app->when(HttpHandler::class)
             ->needs(TokenSourceInterface::class)
-            ->needs('refreshTokenSource')
+            ->needs('$refreshTokenSource')
             ->give(function (Application $app) {
                 return new BodyRefreshTokenSource($app->make(Request::class));
             });
