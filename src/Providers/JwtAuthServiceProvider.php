@@ -2,11 +2,14 @@
 
 namespace Kostyap\JwtAuth\Providers;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Kostyap\JwtAuth\Commands\CopyDefaultController;
+use Kostyap\JwtAuth\Enums\AccessTokenSource;
+use Kostyap\JwtAuth\Enums\RefreshTokenSource;
 use Kostyap\JwtAuth\Enums\RefreshTokenStorage;
 use Kostyap\JwtAuth\Exceptions\InvalidRepositoryImplementation;
 use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
@@ -23,10 +26,9 @@ use Kostyap\JwtAuth\RefreshTokenServices\RefreshUtility;
 use Kostyap\JwtAuth\RefreshTokenServices\Repositories\DatabaseRefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshTokenServices\Repositories\RefreshSessionRepositoryInterface;
 use Kostyap\JwtAuth\RefreshTokenServices\TokenRefresher;
-use Kostyap\JwtAuth\TokenHttpSources\Body\BearerAccessTokenSource;
-use Kostyap\JwtAuth\TokenHttpSources\Body\BodyRefreshTokenSource;
+use Kostyap\JwtAuth\TokenHttpSources\Body;
+use Kostyap\JwtAuth\TokenHttpSources\Cookie;
 use Kostyap\JwtAuth\TokenHttpSources\HttpHandler;
-use Kostyap\JwtAuth\TokenHttpSources\TokenSourceInterface;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token\Builder;
@@ -50,20 +52,7 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->registerTokenRequestGetter();
         $this->registerTokenResponseSetter();
         $this->registerJwtValidator();
-
-        $this->app->when(HttpHandler::class)
-            ->needs(TokenSourceInterface::class)
-            ->needs('$accessTokenSource')
-            ->give(function (Application $app) {
-                return new BearerAccessTokenSource($app->make(Request::class));
-            });
-
-        $this->app->when(HttpHandler::class)
-            ->needs(TokenSourceInterface::class)
-            ->needs('$refreshTokenSource')
-            ->give(function (Application $app) {
-                return new BodyRefreshTokenSource($app->make(Request::class));
-            });
+        $this->registerTokensHttpHandler();
     }
 
     public function boot(): void
@@ -201,6 +190,36 @@ class JwtAuthServiceProvider extends ServiceProvider
                 $app->make(SignatureValidator::class),
                 new Parser(new JoseEncoder()),
             );
+        });
+    }
+
+    protected function registerTokensHttpHandler(): void
+    {
+        $this->app->bind(HttpHandler::class, function (Application $app) {
+            $accessTokenSource = $this->config('token_source.access_token');
+            $refreshTokenSource = $this->config('token_source.refresh_token');
+
+            $accessTokenSource = match ($accessTokenSource) {
+                AccessTokenSource::Bearer => new Body\BearerAccessTokenSource($app->make(Request::class)),
+                AccessTokenSource::Cookie => new Cookie\AccessTokenSource(
+                    $app->make(Request::class), $this->config('refresh_ttl')
+                ),
+                default => throw new BindingResolutionException(
+                    'Cannot bind ' . HttpHandler::class . '. Incorrect access token source value: ' . $accessTokenSource
+                )
+            };
+
+            $refreshTokenSource = match ($refreshTokenSource) {
+                RefreshTokenSource::Body => new Body\BodyRefreshTokenSource($app->make(Request::class)),
+                RefreshTokenSource::Cookie => new Cookie\RefreshTokenSource(
+                    $app->make(Request::class), $this->config('refresh_ttl')
+                ),
+                default => throw new BindingResolutionException(
+                    'Cannot bind ' . HttpHandler::class . '. Incorrect refresh token source value: ' . $refreshTokenSource
+                )
+            };
+
+            return new HttpHandler($accessTokenSource, $refreshTokenSource);
         });
     }
 
