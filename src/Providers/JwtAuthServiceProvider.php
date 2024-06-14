@@ -23,6 +23,10 @@ use Kostyap\JwtAuth\RefreshTokenServices\RefreshUtility;
 use Kostyap\JwtAuth\RefreshTokenServices\Repositories\DatabaseRefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshTokenServices\Repositories\RefreshSessionRepositoryInterface;
 use Kostyap\JwtAuth\RefreshTokenServices\TokenRefresher;
+use Kostyap\JwtAuth\TokenHttpSources\Body\BearerAccessTokenSource;
+use Kostyap\JwtAuth\TokenHttpSources\Body\BodyRefreshTokenSource;
+use Kostyap\JwtAuth\TokenHttpSources\HttpHandler;
+use Kostyap\JwtAuth\TokenHttpSources\TokenSourceInterface;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token\Builder;
@@ -46,6 +50,20 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->registerTokenRequestGetter();
         $this->registerTokenResponseSetter();
         $this->registerJwtValidator();
+
+        $this->app->when(HttpHandler::class)
+            ->needs(TokenSourceInterface::class)
+            ->needs('accessTokenSource')
+            ->give(function (Application $app) {
+                return new BearerAccessTokenSource($app->make(Request::class));
+            });
+
+        $this->app->when(HttpHandler::class)
+            ->needs(TokenSourceInterface::class)
+            ->needs('refreshTokenSource')
+            ->give(function (Application $app) {
+                return new BodyRefreshTokenSource($app->make(Request::class));
+            });
     }
 
     public function boot(): void
