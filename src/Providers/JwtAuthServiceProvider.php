@@ -168,16 +168,10 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->app->bind(HttpHandler::class, function (Application $app) {
             $accessTokenSource = $this->config('token_source.access_token');
             $refreshTokenSource = $this->config('token_source.refresh_token');
+            $refreshTtl = $this->config('refresh_ttl', self::DEFAULT_REFRESH_TTL);
 
-            $accessTokenSource = $app->make(
-                $accessTokenSource->value,
-                ['refreshTtl' => $this->config('refresh_ttl', self::DEFAULT_REFRESH_TTL)]
-            );
-
-            $refreshTokenSource = $app->make(
-                $refreshTokenSource->value,
-                ['refreshTtl' => $this->config('refresh_ttl', self::DEFAULT_REFRESH_TTL)]
-            );
+            $accessTokenSource = $app->make($accessTokenSource->value, compact('refreshTtl'));
+            $refreshTokenSource = $app->make($refreshTokenSource->value, compact('refreshTtl'));
 
             return new HttpHandler($accessTokenSource, $refreshTokenSource);
         });
