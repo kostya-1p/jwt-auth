@@ -2,14 +2,11 @@
 
 namespace Kostyap\JwtAuth\Providers;
 
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Kostyap\JwtAuth\Commands\CopyDefaultController;
-use Kostyap\JwtAuth\Enums\AccessTokenSource;
-use Kostyap\JwtAuth\Enums\RefreshTokenSource;
 use Kostyap\JwtAuth\Enums\RefreshTokenStorage;
 use Kostyap\JwtAuth\Exceptions\InvalidRepositoryImplementation;
 use Kostyap\JwtAuth\JWTGuard;
@@ -24,8 +21,6 @@ use Kostyap\JwtAuth\RefreshTokenServices\RefreshUtility;
 use Kostyap\JwtAuth\RefreshTokenServices\Repositories\DatabaseRefreshSessionRepository;
 use Kostyap\JwtAuth\RefreshTokenServices\Repositories\RefreshSessionRepositoryInterface;
 use Kostyap\JwtAuth\RefreshTokenServices\TokenRefresher;
-use Kostyap\JwtAuth\TokenHttpSources\Body;
-use Kostyap\JwtAuth\TokenHttpSources\Cookie;
 use Kostyap\JwtAuth\TokenHttpSources\HttpHandler;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
@@ -37,6 +32,7 @@ class JwtAuthServiceProvider extends ServiceProvider
 {
     public const CONFIG_FILE_NAME = 'jwt';
     public const CONFIG_FULL_NAME = self::CONFIG_FILE_NAME . '.php';
+    public const DEFAULT_REFRESH_TTL = 20160;
 
     public function register(): void
     {
@@ -151,7 +147,7 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->app->bind(RefreshUtility::class, function (Application $app) {
             return new RefreshUtility(
                 $app->make(RefreshSessionRepositoryInterface::class),
-                $this->config('refresh_ttl', 20160),
+                $this->config('refresh_ttl', self::DEFAULT_REFRESH_TTL),
             );
         });
     }
@@ -173,25 +169,15 @@ class JwtAuthServiceProvider extends ServiceProvider
             $accessTokenSource = $this->config('token_source.access_token');
             $refreshTokenSource = $this->config('token_source.refresh_token');
 
-            $accessTokenSource = match ($accessTokenSource) {
-                AccessTokenSource::Bearer => new Body\BearerAccessTokenSource($app->make(Request::class)),
-                AccessTokenSource::Cookie => new Cookie\AccessTokenSource(
-                    $app->make(Request::class), $this->config('refresh_ttl')
-                ),
-                default => throw new BindingResolutionException(
-                    'Cannot bind ' . HttpHandler::class . '. Incorrect access token source value: ' . $accessTokenSource
-                )
-            };
+            $accessTokenSource = $app->make(
+                $accessTokenSource->value,
+                ['refreshTtl' => $this->config('refresh_ttl', self::DEFAULT_REFRESH_TTL)]
+            );
 
-            $refreshTokenSource = match ($refreshTokenSource) {
-                RefreshTokenSource::Body => new Body\BodyRefreshTokenSource($app->make(Request::class)),
-                RefreshTokenSource::Cookie => new Cookie\RefreshTokenSource(
-                    $app->make(Request::class), $this->config('refresh_ttl')
-                ),
-                default => throw new BindingResolutionException(
-                    'Cannot bind ' . HttpHandler::class . '. Incorrect refresh token source value: ' . $refreshTokenSource
-                )
-            };
+            $refreshTokenSource = $app->make(
+                $refreshTokenSource->value,
+                ['refreshTtl' => $this->config('refresh_ttl', self::DEFAULT_REFRESH_TTL)]
+            );
 
             return new HttpHandler($accessTokenSource, $refreshTokenSource);
         });
