@@ -16,7 +16,6 @@ use Kostyap\JwtAuth\Exceptions\SignatureAlgorithmException;
 use Kostyap\JwtAuth\Exceptions\SignatureKeyException;
 use Kostyap\JwtAuth\Exceptions\TokenExpiredException;
 use Kostyap\JwtAuth\Exceptions\TokenTypeException;
-use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
 use Kostyap\JwtAuth\Helpers\TypeValidator;
 use Kostyap\JwtAuth\JwtServices\Data\TokenPair;
 use Kostyap\JwtAuth\JwtServices\Generators\JWTGenerator;
@@ -25,6 +24,7 @@ use Kostyap\JwtAuth\JwtServices\Parsers\JWTParser;
 use Kostyap\JwtAuth\JwtServices\Validators\JWTValidator;
 use Kostyap\JwtAuth\RefreshTokenServices\Data\RefreshMetaData;
 use Kostyap\JwtAuth\RefreshTokenServices\TokenRefresher;
+use Kostyap\JwtAuth\TokenHttpSources\HttpHandler;
 use Lcobucci\JWT\Token\RegisteredClaims;
 use Random\RandomException;
 
@@ -39,7 +39,7 @@ class JWTGuard implements Guard
         private Request $request,
         private TokenRefresher $refresher,
         UserProvider $provider,
-        private TokenRequestGetter $tokenRequestGetter,
+        private HttpHandler $tokenHttpHandler,
     ) {
         $this->provider = $provider;
     }
@@ -54,7 +54,7 @@ class JWTGuard implements Guard
         }
 
         try {
-            $token = $this->tokenRequestGetter->getAccessToken();
+            $token = $this->tokenHttpHandler->getAccessToken();
             $user = $this->getUserFromToken($token);
 
             $this->validator->validateToken($token, $user);
@@ -138,7 +138,7 @@ class JWTGuard implements Guard
      */
     public function refresh(): TokenPair
     {
-        $tokenPair = $this->getTokenPair();
+        $tokenPair = $this->tokenHttpHandler->getTokens();
         $refreshMetaData = $this->getRefreshMetaData();
 
         $user = $this->getUserFromToken($tokenPair->accessToken);
@@ -159,17 +159,6 @@ class JWTGuard implements Guard
             throw new RequestInputException('Fingerprint is required!');
         }
         return new RefreshMetaData($userAgent, $fingerPrint, $ip);
-    }
-
-    /**
-     * @throws InvalidTokenException
-     */
-    private function getTokenPair(): TokenPair
-    {
-        $accessToken = $this->tokenRequestGetter->getAccessToken();
-        $refreshToken = $this->tokenRequestGetter->getRefreshToken();
-
-        return new TokenPair($accessToken, $refreshToken);
     }
 
     /**

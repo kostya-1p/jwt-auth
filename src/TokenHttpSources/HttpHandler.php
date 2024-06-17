@@ -20,6 +20,11 @@ class HttpHandler
         return new TokenPair($accessToken, $refreshToken);
     }
 
+    public function getAccessToken(): string
+    {
+        return $this->accessTokenSource->getToken();
+    }
+
     public function setTokens(TokenPair $tokenPair, string $emptyBodyMessage = 'Authenticated'): Response
     {
         $response = new Response([]);

@@ -12,8 +12,6 @@ use Kostyap\JwtAuth\Enums\AccessTokenSource;
 use Kostyap\JwtAuth\Enums\RefreshTokenSource;
 use Kostyap\JwtAuth\Enums\RefreshTokenStorage;
 use Kostyap\JwtAuth\Exceptions\InvalidRepositoryImplementation;
-use Kostyap\JwtAuth\Helpers\TokenRequestGetter;
-use Kostyap\JwtAuth\Helpers\TokenResponseSetter;
 use Kostyap\JwtAuth\JWTGuard;
 use Kostyap\JwtAuth\JwtServices\Generators\JWTGenerator;
 use Kostyap\JwtAuth\JwtServices\Generators\JWTSigner;
@@ -49,8 +47,6 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->registerPayloadValidator();
         $this->registerSignatureValidator();
         $this->registerRefreshUtility();
-        $this->registerTokenRequestGetter();
-        $this->registerTokenResponseSetter();
         $this->registerJwtValidator();
         $this->registerTokensHttpHandler();
     }
@@ -81,7 +77,7 @@ class JwtAuthServiceProvider extends ServiceProvider
                 $app->make(Request::class),
                 $app->make(TokenRefresher::class),
                 Auth::createUserProvider($config['provider']),
-                $app->make(TokenRequestGetter::class),
+                $app->make(HttpHandler::class),
             );
         });
     }
@@ -156,28 +152,6 @@ class JwtAuthServiceProvider extends ServiceProvider
             return new RefreshUtility(
                 $app->make(RefreshSessionRepositoryInterface::class),
                 $this->config('refresh_ttl', 20160),
-            );
-        });
-    }
-
-    protected function registerTokenRequestGetter(): void
-    {
-        $this->app->bind(TokenRequestGetter::class, function (Application $app) {
-            return new TokenRequestGetter(
-                $app->make(Request::class),
-                $this->config('token_source.access_token'),
-                $this->config('token_source.refresh_token'),
-            );
-        });
-    }
-
-    protected function registerTokenResponseSetter(): void
-    {
-        $this->app->bind(TokenResponseSetter::class, function (Application $app) {
-            return new TokenResponseSetter(
-                $this->config('token_source.access_token'),
-                $this->config('token_source.refresh_token'),
-                $this->config('refresh_ttl'),
             );
         });
     }
