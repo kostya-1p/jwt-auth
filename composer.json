@@ -21,7 +21,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Kostyap\\JwtAuth\\test\\": "tests/"
+            "Kostyap\\JwtAuth\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",
